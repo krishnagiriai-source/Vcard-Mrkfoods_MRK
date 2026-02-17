@@ -349,28 +349,55 @@ document.addEventListener('DOMContentLoaded', function () {
 // Generates employees-data.js for GitHub upload
 // ============================================
 
-async function publishCards() {
+sync function publishCards() {
+  const btn = document.getElementById('publishBtn') ||
+              document.querySelector('[onclick="publishCards()"]');
+
   try {
+    // Visual feedback – disable button while publishing
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = "⏳ Publishing...";
+    }
+
+    // Read employees from localStorage (same source your app already uses)
     const employees = JSON.parse(localStorage.getItem("MRK_EMPLOYEES") || "[]");
 
+    if (!employees.length) {
+      showToast("⚠️ No employees to publish!", true);
+      return;
+    }
+
+    // Call the Vercel serverless API
     const response = await fetch("/api/publish", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ employees })
+      body: JSON.stringify({ employees }),
     });
 
     const result = await response.json();
 
-    if (result.success) {
-      alert("Published successfully!");
+    if (response.ok && result.success) {
+      showToast("✅ Cards published! GitHub updated automatically.");
+      // Optional: show commit link
+      if (result.commit) {
+        console.log("GitHub commit:", result.commit);
+      }
     } else {
-      alert("Publish failed!");
-      console.error(result);
+      // Show the real error so you can debug
+      console.error("Publish error details:", result);
+      showToast("❌ Publish failed. See console (F12) for details.", true);
     }
 
-  } catch (err) {
-    console.error(err);
-    alert("Server error");
+  } catch (error) {
+    console.error("Network/server error:", error);
+    showToast("❌ Could not reach publish API.", true);
+
+  } finally {
+    // Always re-enable button
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = "🚀 Publish Cards";
+    }
   }
 }
-
