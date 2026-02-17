@@ -349,7 +349,7 @@ document.addEventListener('DOMContentLoaded', function () {
 // Generates employees-data.js for GitHub upload
 // ============================================
 
-sync function publishCards() {
+async function publishCards() {
   const btn = document.getElementById('publishBtn') ||
               document.querySelector('[onclick="publishCards()"]');
 
@@ -361,7 +361,7 @@ sync function publishCards() {
     }
 
     // Read employees from localStorage (same source your app already uses)
-    const employees = JSON.parse(localStorage.getItem("MRK_EMPLOYEES") || "[]");
+    const employees = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
 
     if (!employees.length) {
       showToast("⚠️ No employees to publish!", true);
