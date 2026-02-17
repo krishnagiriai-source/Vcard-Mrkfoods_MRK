@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MRK Foods — Admin Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/jpeg" href="mrk_logo.jpg">
+</head>
+<body class="dashboard-body">
+
+  <!-- TOP BAR -->
+  <nav class="topbar">
+    <div class="topbar-brand">
+      <img src="mrk_logo.jpg" alt="MRK Foods" onerror="this.style.display='none'">
+      <div>
+        <div class="topbar-brand-name">MRK Foods Private Limited</div>
+        <div class="topbar-brand-sub">Admin Dashboard</div>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <span class="topbar-user">👤 Admin</span>
+      <button class="btn btn-secondary btn-sm" onclick="logout()">Logout</button>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <div class="container">
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1 class="page-title">Employee Cards</h1>
+      <p class="page-subtitle">Manage digital visiting cards for your team</p>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-number" id="statTotal">0</div>
+        <div class="stat-label">Total Employees</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" style="color:var(--maroon)">∞</div>
+        <div class="stat-label">Active Cards</div>
+      </div>
+    </div>
+
+    <!-- Employee List -->
+    <div class="card-section">
+      <div class="section-header">
+        <h2 class="section-title">👥 All Employees</h2>
+        <button class="btn btn-maroon" onclick="openModal('empModal')">
+          ➕ Add New Employee
+        </button>
+      </div>
+
+      <div id="emptyState" class="empty-state" style="display:none">
+        <div class="empty-icon">👤</div>
+        <p>No employees yet. Click <strong>Add New Employee</strong> to get started.</p>
+      </div>
+
+      <div style="overflow-x:auto">
+        <table class="emp-table">
+          <thead>
+            <tr>
+              <th>Employee</th>
+              <th>Mobile</th>
+              <th>Designation</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="empTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Instructions -->
+    <div class="card-section">
+      <div class="section-header">
+        <h2 class="section-title">📖 How It Works</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px">
+        <div style="background:var(--gray-100);padding:20px;border-radius:12px">
+          <div style="font-size:28px;margin-bottom:8px">1️⃣</div>
+          <div style="font-weight:600;color:var(--maroon);margin-bottom:4px">Create Employee</div>
+          <div style="font-size:13px;color:var(--gray-600)">Fill in employee details, upload photo, paste catalogue link.</div>
+        </div>
+        <div style="background:var(--gray-100);padding:20px;border-radius:12px">
+          <div style="font-size:28px;margin-bottom:8px">2️⃣</div>
+          <div style="font-weight:600;color:var(--maroon);margin-bottom:4px">Get Card Link</div>
+          <div style="font-size:13px;color:var(--gray-600)">Copy the unique public link or download the QR code.</div>
+        </div>
+        <div style="background:var(--gray-100);padding:20px;border-radius:12px">
+          <div style="font-size:28px;margin-bottom:8px">3️⃣</div>
+          <div style="font-weight:600;color:var(--maroon);margin-bottom:4px">Share With Customers</div>
+          <div style="font-size:13px;color:var(--gray-600)">Customer scans QR → opens card → no login required.</div>
+        </div>
+        <div style="background:var(--gray-100);padding:20px;border-radius:12px">
+          <div style="font-size:28px;margin-bottom:8px">4️⃣</div>
+          <div style="font-weight:600;color:var(--maroon);margin-bottom:4px">Customer Actions</div>
+          <div style="font-size:13px;color:var(--gray-600)">Call, WhatsApp, Email, Save Contact, View Catalogue.</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /container -->
+
+  <!-- ============ ADD/EDIT EMPLOYEE MODAL ============ -->
+  <div class="modal-overlay" id="empModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modalTitle">Add New Employee</h3>
+        <button class="modal-close" onclick="closeModal('empModal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="empId">
+        <form id="empForm" onsubmit="event.preventDefault(); saveEmployee()">
+
+          <!-- Photo Upload -->
+          <div style="margin-bottom:24px">
+            <label style="display:block;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--gray-600);margin-bottom:8px">Employee Photo</label>
+            <div class="photo-upload-area" onclick="document.getElementById('empPhoto').click()">
+              <img id="photoPreview" class="photo-preview" src="" alt="Preview" style="display:none">
+              <div id="photoPlaceholder" class="upload-placeholder" style="display:flex;flex-direction:column;align-items:center">
+                <span class="upload-icon">📷</span>
+                <span>Click to upload employee photo</span>
+                <span style="font-size:11px;margin-top:4px;color:#b0aca4">JPG, PNG • Full face visible • Max 5MB</span>
+              </div>
+              <input type="file" id="empPhoto" accept="image/*" style="display:none">
+            </div>
+          </div>
+
+          <!-- Basic Info -->
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Employee Name *</label>
+              <input type="text" id="empName" placeholder="e.g. Krishnadev Giri" required>
+            </div>
+            <div class="form-group">
+              <label>Designation</label>
+              <input type="text" id="empDesignation" placeholder="e.g. IT & Admin Manager">
+            </div>
+            <div class="form-group">
+              <label>Mobile Number</label>
+              <input type="tel" id="empMobile" placeholder="+91 98765 43210">
+            </div>
+            <div class="form-group">
+              <label>Email Address</label>
+              <input type="email" id="empEmail" placeholder="name@mrkfoods.in">
+            </div>
+            <div class="form-group">
+              <label>Website URL</label>
+              <input type="text" id="empWebsite" placeholder="https://www.mrkfoods.in/">
+            </div>
+            <div class="form-group">
+              <label>WhatsApp Number</label>
+              <input type="tel" id="empWhatsapp" placeholder="+91 98765 43210 (with country code)">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Full Address</label>
+            <textarea id="empAddress" placeholder="Vijay House, Ground Floor, Devidayal Compound, near Samriddhi Garden, Bhandup West, Mumbai, Maharashtra 400078"></textarea>
+          </div>
+
+          <!-- Social Links -->
+          <div style="margin-bottom:16px">
+            <div style="font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--gray-600);margin-bottom:12px">Social Media Links</div>
+            <div class="form-grid form-grid-3">
+              <div class="form-group">
+                <label>Facebook URL</label>
+                <input type="url" id="empFacebook" placeholder="https://facebook.com/...">
+              </div>
+              <div class="form-group">
+                <label>LinkedIn URL</label>
+                <input type="url" id="empLinkedin" placeholder="https://linkedin.com/in/...">
+              </div>
+              <div class="form-group">
+                <label>Instagram URL</label>
+                <input type="url" id="empInstagram" placeholder="https://instagram.com/...">
+              </div>
+            </div>
+          </div>
+
+          <!-- Catalogue -->
+          <div style="background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(78,124,42,0.05));border:2px dashed var(--gold);border-radius:12px;padding:20px;margin-bottom:20px">
+            <div style="font-size:13px;font-weight:600;color:#8a6a1a;margin-bottom:10px">📁 Product Catalogue Link</div>
+            <div class="form-group" style="margin-bottom:0">
+              <label>Paste Catalogue Link (Google Drive / OneDrive / PDF URL)</label>
+              <input type="url" id="empCatalogueLink" placeholder="https://drive.google.com/file/d/... or https://onedrive.live.com/...">
+            </div>
+            <p style="font-size:12px;color:var(--gray-600);margin-top:8px">
+              💡 Tip: Paste a shareable link from Google Drive, OneDrive, or any direct PDF URL. The "View Catalogue" button will appear on the card.
+            </p>
+          </div>
+
+          <!-- Company Logo Override -->
+          <div style="margin-bottom:8px">
+            <div style="font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--gray-600);margin-bottom:8px">Company Logo Override (optional)</div>
+            <div class="form-group">
+              <label>Upload alternate company logo for this card</label>
+              <input type="file" id="companyLogoOverride" accept="image/*" style="padding:8px;font-size:13px">
+            </div>
+            <img id="logoPreviewImg" src="" alt="" style="display:none;max-height:50px;margin-top:8px;border-radius:8px">
+          </div>
+
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('empModal')">Cancel</button>
+        <button class="btn btn-maroon" onclick="saveEmployee()">💾 Save Employee Card</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ QR MODAL ============ -->
+  <div class="modal-overlay" id="qrModal">
+    <div class="modal" style="max-width:480px">
+      <div class="modal-header">
+        <h3 class="modal-title">📱 QR Code & Card Link</h3>
+        <button class="modal-close" onclick="closeModal('qrModal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="qr-display">
+          <p style="font-weight:600;color:var(--maroon);margin-bottom:16px" id="qrEmpName"></p>
+          <img id="qrImage" src="" alt="QR Code" class="qr-code-img" style="width:200px;height:200px">
+          <p style="font-size:12px;color:var(--gray-600);margin:12px 0 8px">Scan to open card. No login required.</p>
+          <div class="card-url" id="qrCardUrl"></div>
+          <input type="hidden" id="qrCardUrlHidden">
+          <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+            <button class="btn btn-green" onclick="copyQRLink()">🔗 Copy Link</button>
+            <button class="btn btn-maroon" onclick="downloadQR()">⬇️ Download QR</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script src="admin.js"></script>
+  <script>initDashboard();</script>
+</body>
+</html>
