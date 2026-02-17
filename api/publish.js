@@ -1,6 +1,6 @@
 export default async function handler(req, res) {
   if (req.method !== "POST") {
-    return res.status(405).json({ success: false, error: "Method not allowed" });
+    return res.status(405).json({ success: false });
   }
 
   try {
@@ -11,11 +11,11 @@ export default async function handler(req, res) {
     const branch = process.env.GITHUB_BRANCH;
     const token = process.env.GITHUB_TOKEN;
 
-    const filePath = "employees-data.js";
+    const path = "employees-data.js";
 
-    // 1️⃣ Get existing file (get SHA)
-    const getResponse = await fetch(
-      `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}?ref=${branch}`,
+    // 1️⃣ GET existing file to get SHA
+    const getFile = await fetch(
+      `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -24,32 +24,32 @@ export default async function handler(req, res) {
       }
     );
 
-    if (!getResponse.ok) {
-      const err = await getResponse.json();
+    if (!getFile.ok) {
+      const err = await getFile.json();
       return res.status(500).json({ success: false, error: err });
     }
 
-    const fileData = await getResponse.json();
+    const fileData = await getFile.json();
     const sha = fileData.sha;
 
-    // 2️⃣ Prepare updated content
-    const newContent =
-      `// Auto-generated file\n` +
-      `window.MRK_EMPLOYEES = ${JSON.stringify(employees, null, 2)};`;
+    // 2️⃣ Create new file content
+    const content = `
+window.MRK_EMPLOYEES = ${JSON.stringify(employees, null, 2)};
+`;
 
-    const base64Content = Buffer.from(newContent).toString("base64");
+    const base64Content = Buffer.from(content).toString("base64");
 
-    // 3️⃣ Update file
-    const updateResponse = await fetch(
-      `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`,
+    // 3️⃣ PUT update with SHA
+    const updateFile = await fetch(
+      `https://api.github.com/repos/${owner}/${repo}/contents/${path}`,
       {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json"
+          Accept: "application/vnd.github+json"
         },
         body: JSON.stringify({
-          message: "Auto update employees-data.js from dashboard",
+          message: "Auto update employees-data.js",
           content: base64Content,
           sha: sha,
           branch: branch
@@ -57,10 +57,10 @@ export default async function handler(req, res) {
       }
     );
 
-    const updateData = await updateResponse.json();
+    const updateResult = await updateFile.json();
 
-    if (!updateResponse.ok) {
-      return res.status(500).json({ success: false, error: updateData });
+    if (!updateFile.ok) {
+      return res.status(500).json({ success: false, error: updateResult });
     }
 
     return res.status(200).json({ success: true });
