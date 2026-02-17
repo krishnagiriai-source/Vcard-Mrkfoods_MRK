@@ -1,36 +1,66 @@
 export default async function handler(req, res) {
   if (req.method !== "POST") {
-    return res.status(405).json({ success: false });
+    return res.status(405).json({ success: false, error: "Method not allowed" });
   }
 
   try {
     const { employees } = req.body;
 
-    const content = `// Auto-generated file
-window.MRK_EMPLOYEES = ${JSON.stringify(employees, null, 2)};`;
+    const owner = process.env.GITHUB_OWNER;
+    const repo = process.env.GITHUB_REPO;
+    const branch = process.env.GITHUB_BRANCH;
+    const token = process.env.GITHUB_TOKEN;
 
-    const base64Content = Buffer.from(content).toString("base64");
+    const filePath = "employees-data.js";
 
-    const response = await fetch(
-      `https://api.github.com/repos/${process.env.GITHUB_OWNER}/${process.env.GITHUB_REPO}/contents/employees-data.js`,
+    // 1️⃣ Get existing file (get SHA)
+    const getResponse = await fetch(
+      `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}?ref=${branch}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/vnd.github+json"
+        }
+      }
+    );
+
+    if (!getResponse.ok) {
+      const err = await getResponse.json();
+      return res.status(500).json({ success: false, error: err });
+    }
+
+    const fileData = await getResponse.json();
+    const sha = fileData.sha;
+
+    // 2️⃣ Prepare updated content
+    const newContent =
+      `// Auto-generated file\n` +
+      `window.MRK_EMPLOYEES = ${JSON.stringify(employees, null, 2)};`;
+
+    const base64Content = Buffer.from(newContent).toString("base64");
+
+    // 3️⃣ Update file
+    const updateResponse = await fetch(
+      `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`,
       {
         method: "PUT",
         headers: {
-          Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
           message: "Auto update employees-data.js from dashboard",
           content: base64Content,
-          branch: process.env.GITHUB_BRANCH
+          sha: sha,
+          branch: branch
         })
       }
     );
 
-    const data = await response.json();
+    const updateData = await updateResponse.json();
 
-    if (!response.ok) {
-      return res.status(500).json({ success: false, error: data });
+    if (!updateResponse.ok) {
+      return res.status(500).json({ success: false, error: updateData });
     }
 
     return res.status(200).json({ success: true });
