@@ -1,5 +1,5 @@
 // MRK Foods - Employee Data File
-// Auto-published: 2026-02-18T09:36:31.821Z
+// Auto-published: 2026-02-18T09:37:41.236Z
 window.MRK_EMPLOYEES = [
   {
     "id": "emp1771398484309",
@@ -76,7 +76,7 @@ window.MRK_EMPLOYEES = [
     "mobile": "9833505114",
     "email": "suraj.jadhav@mrkfoods.in",
     "website": "https://www.mrkfoods.in/",
-    "address": "",
+    "address": "Ground Floor,Vijay House, Devidayal Compound, LBS Road, Near Samruddhi Garden, Behind Apollo Pharmacy. Bhandup West-400078, Mumbai, Maharashtra.",
     "whatsapp": "+91 9833505114",
     "facebook": "https://www.facebook.com/mrkfoodspvtltd/",
     "linkedin": "https://wa.me/919833505114",
@@ -110,7 +110,7 @@ window.MRK_EMPLOYEES = [
     "mobile": "9594723985",
     "email": "sheetal@mrkfoods.in",
     "website": "https://www.mrkfoods.in/",
-    "address": "",
+    "address": "Ground Floor,Vijay House, Devidayal Compound, LBS Road, Near Samruddhi Garden, Behind Apollo Pharmacy. Bhandup West-400078, Mumbai, Maharashtra.",
     "whatsapp": "+919594723985",
     "facebook": "https://www.facebook.com/mrkfoodspvtltd/",
     "linkedin": "https://wa.me/919594723985",
@@ -127,7 +127,7 @@ window.MRK_EMPLOYEES = [
     "mobile": "8108183333",
     "email": "khushi.dama@mrkfoods.in",
     "website": "https://www.mrkfoods.in/",
-    "address": "",
+    "address": "Ground Floor,Vijay House, Devidayal Compound, LBS Road, Near Samruddhi Garden, Behind Apollo Pharmacy. Bhandup West-400078, Mumbai, Maharashtra.",
     "whatsapp": "+918108183333",
     "facebook": "https://www.facebook.com/mrkfoodspvtltd/",
     "linkedin": "https://wa.me/918108183333",
