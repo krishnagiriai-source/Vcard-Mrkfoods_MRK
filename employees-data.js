@@ -1,5 +1,5 @@
 // MRK Foods - Employee Data File
-// Auto-published: 2026-02-18T07:20:08.648Z
+// Auto-published: 2026-02-18T07:26:12.426Z
 window.MRK_EMPLOYEES = [
   {
     "id": "emp1771398484309",
@@ -34,5 +34,22 @@ window.MRK_EMPLOYEES = [
     "photo": null,
     "logo": null,
     "createdAt": "2026-02-18T07:20:02.202Z"
+  },
+  {
+    "id": "emp1771399566555",
+    "name": "Arun Kumar Nalliya",
+    "designation": "Branch Manager (Hyderabad)",
+    "mobile": "9594723981",
+    "email": "saifoodshyd@gmail.com",
+    "website": "https://www.mrkfoods.in/",
+    "address": "No. 5-9-262/ 1 And 2 Rajiv Gandhi Nagar, Prashanthi Nagar, Kukatpally, Hyderabad- 500070",
+    "whatsapp": "9594723981",
+    "facebook": "https://www.facebook.com/mrkfoodspvtltd/",
+    "linkedin": "https://wa.me/919594723981",
+    "instagram": "https://www.instagram.com/mrkfoodspvtltd/?hl=en",
+    "catalogueLink": "MRK_Retail Catalogue.pdf",
+    "photo": null,
+    "logo": null,
+    "createdAt": "2026-02-18T07:26:06.555Z"
   }
 ];
