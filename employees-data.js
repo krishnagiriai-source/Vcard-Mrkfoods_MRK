@@ -1,5 +1,5 @@
 // MRK Foods - Employee Data File
-// Auto-published: 2026-02-18T07:37:48.061Z
+// Auto-published: 2026-02-18T07:40:39.803Z
 window.MRK_EMPLOYEES = [
   {
     "id": "emp1771398484309",
@@ -68,5 +68,22 @@ window.MRK_EMPLOYEES = [
     "photo": null,
     "logo": null,
     "createdAt": "2026-02-18T07:37:42.453Z"
+  },
+  {
+    "id": "emp1771400433432",
+    "name": "Suraj Ashok Jadhav",
+    "designation": "VP Sales & Marketing (National)",
+    "mobile": "9833505114",
+    "email": "suraj.jadhav@mrkfoods.in",
+    "website": "https://www.mrkfoods.in/",
+    "address": "",
+    "whatsapp": "+91 9833505114",
+    "facebook": "https://www.facebook.com/mrkfoodspvtltd/",
+    "linkedin": "https://wa.me/919833505114",
+    "instagram": "https://www.instagram.com/mrkfoodspvtltd/?hl=en",
+    "catalogueLink": "MRK_Retail Catalogue.pdf",
+    "photo": null,
+    "logo": null,
+    "createdAt": "2026-02-18T07:40:33.432Z"
   }
 ];
