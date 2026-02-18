@@ -1,5 +1,5 @@
 // MRK Foods - Employee Data File
-// Auto-published: 2026-02-18T10:21:28.488Z
+// Auto-published: 2026-02-18T10:25:09.414Z
 window.MRK_EMPLOYEES = [
   {
     "id": "emp1771398484309",
@@ -153,5 +153,22 @@ window.MRK_EMPLOYEES = [
     "photo": null,
     "logo": null,
     "createdAt": "2026-02-18T10:13:58.543Z"
+  },
+  {
+    "id": "emp1771410303302",
+    "name": "Kenneth Lobo",
+    "designation": "General Manager Procurement",
+    "mobile": "9819133474",
+    "email": "kenneth.lobo@mrkfoods.in",
+    "website": "https://www.mrkfoods.in/",
+    "address": "Ground Floor,Vijay House, Devidayal Compound, LBS Road, Near Samruddhi Garden, Opposite Ishwar Nagar post Office, Behind Apollo Pharmacy. Bhandup West-400078 Mumbai, Maharashtra.",
+    "whatsapp": "+919819133474",
+    "facebook": "https://www.facebook.com/mrkfoodspvtltd/",
+    "linkedin": "https://wa.me/919819133474",
+    "instagram": "https://www.instagram.com/mrkfoodspvtltd/?hl=en",
+    "catalogueLink": "MRK_Retail Catalogue.pdf",
+    "photo": null,
+    "logo": null,
+    "createdAt": "2026-02-18T10:25:03.304Z"
   }
 ];
