@@ -1,5 +1,5 @@
 // MRK Foods - Employee Data File
-// Auto-published: 2026-02-18T07:26:12.426Z
+// Auto-published: 2026-02-18T07:37:48.061Z
 window.MRK_EMPLOYEES = [
   {
     "id": "emp1771398484309",
@@ -51,5 +51,22 @@ window.MRK_EMPLOYEES = [
     "photo": null,
     "logo": null,
     "createdAt": "2026-02-18T07:26:06.555Z"
+  },
+  {
+    "id": "emp1771400262453",
+    "name": "Sudeep Yogendra Nayak",
+    "designation": "Business Development Manager",
+    "mobile": "9321992956",
+    "email": "sales01@mrkfoods.in",
+    "website": "https://www.mrkfoods.in/",
+    "address": "P-46, Hide Road, Extension Taratala, Kolkata, West Bengal- 700088",
+    "whatsapp": "+91 9321992956",
+    "facebook": "https://www.facebook.com/mrkfoodspvtltd/",
+    "linkedin": "https://wa.me/919321992956",
+    "instagram": "https://www.instagram.com/mrkfoodspvtltd/?hl=en",
+    "catalogueLink": "MRK_Retail Catalogue.pdf",
+    "photo": null,
+    "logo": null,
+    "createdAt": "2026-02-18T07:37:42.453Z"
   }
 ];
