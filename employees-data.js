@@ -1,5 +1,5 @@
 // MRK Foods - Employee Data File
-// Auto-published: 2026-02-18T09:34:28.027Z
+// Auto-published: 2026-02-18T09:36:31.821Z
 window.MRK_EMPLOYEES = [
   {
     "id": "emp1771398484309",
@@ -119,5 +119,22 @@ window.MRK_EMPLOYEES = [
     "photo": null,
     "logo": null,
     "createdAt": "2026-02-18T09:34:13.041Z"
+  },
+  {
+    "id": "emp1771407385267",
+    "name": "Khushi Dhiraj Dama",
+    "designation": "Business Development Director",
+    "mobile": "8108183333",
+    "email": "khushi.dama@mrkfoods.in",
+    "website": "https://www.mrkfoods.in/",
+    "address": "",
+    "whatsapp": "+918108183333",
+    "facebook": "https://www.facebook.com/mrkfoodspvtltd/",
+    "linkedin": "https://wa.me/918108183333",
+    "instagram": "https://www.instagram.com/mrkfoodspvtltd/?hl=en",
+    "catalogueLink": "MRK_Retail Catalogue.pdf",
+    "photo": null,
+    "logo": null,
+    "createdAt": "2026-02-18T09:36:25.268Z"
   }
 ];
