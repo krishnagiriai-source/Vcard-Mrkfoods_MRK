@@ -1,5 +1,5 @@
 // MRK Foods - Employee Data File
-// Auto-published: 2026-02-18T09:37:41.236Z
+// Auto-published: 2026-02-18T10:01:05.576Z
 window.MRK_EMPLOYEES = [
   {
     "id": "emp1771398484309",
@@ -9,7 +9,7 @@ window.MRK_EMPLOYEES = [
     "email": "manager.rajasthan@mrkfoods.in",
     "website": "https://www.mrkfoods.in/",
     "address": "Ganga pol,  Samod House, Near Jorawar Singh Gate, Amer Road, Jaipur, Rajasthan - 302002, India.",
-    "whatsapp": "9004083384",
+    "whatsapp": "+919004083384",
     "facebook": "https://www.facebook.com/mrkfoodspvtltd/",
     "linkedin": "https://wa.me/919004083384",
     "instagram": "https://www.instagram.com/mrkfoodspvtltd/?hl=en",
@@ -43,7 +43,7 @@ window.MRK_EMPLOYEES = [
     "email": "saifoodshyd@gmail.com",
     "website": "https://www.mrkfoods.in/",
     "address": "No. 5-9-262/ 1 And 2 Rajiv Gandhi Nagar, Prashanthi Nagar, Kukatpally, Hyderabad- 500070",
-    "whatsapp": "9594723981",
+    "whatsapp": "+919594723981",
     "facebook": "https://www.facebook.com/mrkfoodspvtltd/",
     "linkedin": "https://wa.me/919594723981",
     "instagram": "https://www.instagram.com/mrkfoodspvtltd/?hl=en",
@@ -54,7 +54,7 @@ window.MRK_EMPLOYEES = [
   },
   {
     "id": "emp1771400262453",
-    "name": "Sudeep Yogendra Nayak",
+    "name": "Sudeep Nayak",
     "designation": "Business Development Manager",
     "mobile": "9321992956",
     "email": "sales01@mrkfoods.in",
@@ -71,7 +71,7 @@ window.MRK_EMPLOYEES = [
   },
   {
     "id": "emp1771400433432",
-    "name": "Suraj Ashok Jadhav",
+    "name": "Suraj Jadhav",
     "designation": "VP Sales & Marketing (National)",
     "mobile": "9833505114",
     "email": "suraj.jadhav@mrkfoods.in",
@@ -88,7 +88,7 @@ window.MRK_EMPLOYEES = [
   },
   {
     "id": "emp1771401336262",
-    "name": "Smita Gaurav Hajare",
+    "name": "Smita Hajare",
     "designation": "Sales Manager (Regional)",
     "mobile": "9664360657",
     "email": "dispatch@mrkfoods.in",
@@ -105,7 +105,7 @@ window.MRK_EMPLOYEES = [
   },
   {
     "id": "emp1771407253030",
-    "name": "Sheetal Suresh Jandial",
+    "name": "Sheetal Jandial",
     "designation": "Marketing Consultant",
     "mobile": "9594723985",
     "email": "sheetal@mrkfoods.in",
@@ -122,7 +122,7 @@ window.MRK_EMPLOYEES = [
   },
   {
     "id": "emp1771407385267",
-    "name": "Khushi Dhiraj Dama",
+    "name": "Khushi Dama",
     "designation": "Business Development Director",
     "mobile": "8108183333",
     "email": "khushi.dama@mrkfoods.in",
