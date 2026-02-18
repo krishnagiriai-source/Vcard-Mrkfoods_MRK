@@ -1,5 +1,5 @@
 // MRK Foods - Employee Data File
-// Auto-published: 2026-02-18T10:30:46.629Z
+// Auto-published: 2026-02-18T10:43:47.937Z
 window.MRK_EMPLOYEES = [
   {
     "id": "emp1771398484309",
@@ -187,5 +187,22 @@ window.MRK_EMPLOYEES = [
     "photo": null,
     "logo": null,
     "createdAt": "2026-02-18T10:30:39.309Z"
+  },
+  {
+    "id": "emp1771411421423",
+    "name": "Gaurav Pagare",
+    "designation": "Sr. Manager- Ecommerce",
+    "mobile": "9545588433",
+    "email": "ecomm02@mrkfoods.in",
+    "website": "https://www.mrkfoods.in/",
+    "address": "Ground Floor,Vijay House, Devidayal Compound, LBS Road, Near Samruddhi Garden, Opposite Ishwar Nagar post Office, Behind Apollo Pharmacy. Bhandup West-400078 Mumbai, Maharashtra",
+    "whatsapp": "+91 9545588433",
+    "facebook": "https://www.facebook.com/mrkfoodspvtltd/",
+    "linkedin": "https://wa.me/919545588433",
+    "instagram": "https://www.instagram.com/mrkfoodspvtltd/?hl=en",
+    "catalogueLink": "MRK_Retail Catalogue.pdf",
+    "photo": null,
+    "logo": null,
+    "createdAt": "2026-02-18T10:43:41.423Z"
   }
 ];
