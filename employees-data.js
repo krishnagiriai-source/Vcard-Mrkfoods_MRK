@@ -1,5 +1,5 @@
 // MRK Foods - Employee Data File
-// Auto-published: 2026-02-18T10:01:05.576Z
+// Auto-published: 2026-02-18T10:14:05.446Z
 window.MRK_EMPLOYEES = [
   {
     "id": "emp1771398484309",
@@ -136,5 +136,22 @@ window.MRK_EMPLOYEES = [
     "photo": null,
     "logo": null,
     "createdAt": "2026-02-18T09:36:25.268Z"
+  },
+  {
+    "id": "emp1771409638543",
+    "name": "Dhiraj Tiwari",
+    "designation": "Marketing Executive",
+    "mobile": "9769775481",
+    "email": "sales08@mrkfoods.in",
+    "website": "https://www.mrkfoods.in/",
+    "address": "Ground Floor,Vijay House, Devidayal Compound, LBS Road, Near Samruddhi Garden, Opposite Ishwar Nagar post Office, Behind Apollo Pharmacy. Bhandup West-400078 Mumbai, Maharashtra.",
+    "whatsapp": "+91 9769775481",
+    "facebook": "https://www.facebook.com/mrkfoodspvtltd/",
+    "linkedin": "https://wa.me/919769775481",
+    "instagram": "https://www.instagram.com/mrkfoodspvtltd/?hl=en",
+    "catalogueLink": "MRK_Retail Catalogue.pdf",
+    "photo": null,
+    "logo": null,
+    "createdAt": "2026-02-18T10:13:58.543Z"
   }
 ];
