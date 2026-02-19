@@ -1,10 +1,10 @@
 // MRK Foods - Employee Data File
-// Auto-published: 2026-02-19T10:41:09.177Z
+// Auto-published: 2026-02-19T10:47:26.701Z
 window.MRK_EMPLOYEES = [
   {
     "id": "emp1771398484309",
     "name": "Rohit Gaikwad",
-    "designation": "Sales & Operations Manager-Jaipur",
+    "designation": "Branch Head-Jaipur",
     "mobile": "9004083384",
     "email": "manager.rajasthan@mrkfoods.in",
     "website": "https://www.mrkfoods.in/",
