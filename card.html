@@ -3,143 +3,751 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Digital Card — MRK Foods Private Limited</title>
-  <meta name="description" content="Digital Visiting Card — MRK Foods Private Limited">
-  <meta property="og:title" content="Digital Card — MRK Foods Private Limited">
-  <meta property="og:description" content="Connect with our team member">
-  <link rel="stylesheet" href="style.css">
+  <title>Digital Card — MRK Foods</title>
+  <meta name="theme-color" content="#050d1a">
   <link rel="icon" type="image/jpeg" href="mrk_logo.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ══════════════════════════════════════════
+       DESIGN SYSTEM — Midnight Luxury Palette
+    ══════════════════════════════════════════ */
+    :root {
+      --navy:      #050d1a;
+      --navy2:     #0a1628;
+      --navy3:     #0f1f35;
+      --gold:      #d4a843;
+      --gold2:     #f0c96a;
+      --gold-pale: rgba(212,168,67,0.12);
+      --crimson:   #8b1a2e;
+      --teal:      #0b4f6c;
+      --glass:     rgba(255,255,255,0.04);
+      --glass2:    rgba(255,255,255,0.07);
+      --border:    rgba(212,168,67,0.18);
+      --border2:   rgba(255,255,255,0.08);
+      --text:      #f0e8d8;
+      --muted:     #8a9ab5;
+      --radius:    22px;
+      --shadow:    0 24px 64px rgba(0,0,0,0.6);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--navy);
+      min-height: 100vh;
+      color: var(--text);
+      overflow-x: hidden;
+      display: flex;
+      justify-content: center;
+    }
+
+    /* ─── ANIMATED MESH BACKGROUND ─── */
+    .bg-canvas {
+      position: fixed; inset: 0; z-index: 0;
+      background: var(--navy);
+      overflow: hidden;
+    }
+    .bg-canvas::before {
+      content: '';
+      position: absolute; inset: -40%;
+      background:
+        radial-gradient(ellipse 55% 40% at 15% 15%, rgba(11,79,108,0.55) 0%, transparent 55%),
+        radial-gradient(ellipse 40% 35% at 85% 20%, rgba(139,26,46,0.4) 0%, transparent 50%),
+        radial-gradient(ellipse 50% 45% at 70% 85%, rgba(11,79,108,0.35) 0%, transparent 55%),
+        radial-gradient(ellipse 30% 30% at 30% 80%, rgba(212,168,67,0.12) 0%, transparent 50%);
+      animation: meshDrift 12s ease-in-out infinite alternate;
+    }
+    @keyframes meshDrift {
+      from { transform: translate(-2%, -1%) scale(1); }
+      to   { transform: translate(2%, 1%) scale(1.03); }
+    }
+    /* Subtle dot grid */
+    .bg-canvas::after {
+      content: '';
+      position: absolute; inset: 0;
+      background-image: radial-gradient(rgba(212,168,67,0.12) 1px, transparent 1px);
+      background-size: 32px 32px;
+      opacity: 0.5;
+    }
+
+    /* ─── MAIN CONTAINER ─── */
+    .card-wrap {
+      position: relative; z-index: 1;
+      width: 100%; max-width: 420px;
+      padding: 0 0 80px;
+    }
+
+    /* ─── LOADING ─── */
+    #loadingState {
+      position: fixed; inset: 0; z-index: 200;
+      display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 18px;
+      background: var(--navy);
+    }
+    .spinner {
+      width: 48px; height: 48px; position: relative;
+    }
+    .spinner::before, .spinner::after {
+      content: '';
+      position: absolute; inset: 0; border-radius: 50%;
+    }
+    .spinner::before {
+      border: 2px solid rgba(212,168,67,0.1);
+    }
+    .spinner::after {
+      border: 2px solid transparent;
+      border-top-color: var(--gold);
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .load-text { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); opacity: 0.6; }
+
+    /* ─── ERROR ─── */
+    #errorState {
+      display: none; position: fixed; inset: 0; z-index: 190;
+      align-items: center; justify-content: center; flex-direction: column; gap: 12px; padding: 40px;
+      background: var(--navy);
+    }
+    .err-icon { font-size: 44px; opacity: 0.5; }
+    .err-head { font-family: 'Cormorant Garamond', serif; font-size: 24px; color: var(--gold); }
+    .err-body { font-size: 14px; color: var(--muted); text-align: center; }
+
+    /* ─── HERO SECTION ─── */
+    .hero {
+      position: relative;
+      padding: 52px 24px 0;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    /* Company topbar */
+    .company-strip {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      margin-bottom: 40px;
+      opacity: 0; animation: slideDown 0.5s 0.1s ease forwards;
+    }
+    .co-logo {
+      width: 32px; height: 32px; border-radius: 8px;
+      object-fit: contain; border: 1px solid var(--border);
+      background: rgba(255,255,255,0.05); padding: 3px;
+    }
+    .co-name {
+      font-size: 11px; font-weight: 600; letter-spacing: 2.5px;
+      text-transform: uppercase; color: var(--gold); opacity: 0.8;
+    }
+
+    /* Avatar with animated ring */
+    .avatar-container {
+      position: relative; width: 136px; height: 136px;
+      margin: 0 auto 24px;
+      opacity: 0; animation: zoomIn 0.6s 0.2s cubic-bezier(0.34,1.56,0.64,1) forwards;
+    }
+    .avatar-ring-outer {
+      position: absolute; inset: -5px; border-radius: 50%;
+      background: conic-gradient(from 0deg, var(--gold), var(--crimson) 30%, var(--teal) 60%, var(--gold));
+      animation: rotateConic 5s linear infinite;
+    }
+    @keyframes rotateConic { to { transform: rotate(360deg); } }
+    .avatar-ring-inner {
+      position: absolute; inset: 2px; border-radius: 50%;
+      background: var(--navy); z-index: 1;
+    }
+    .avatar-img {
+      position: absolute; inset: 6px; z-index: 2;
+      border-radius: 50%;
+      object-fit: cover; object-position: top center;
+      width: calc(100% - 12px); height: calc(100% - 12px);
+    }
+    .avatar-initials {
+      position: absolute; inset: 6px; z-index: 2;
+      border-radius: 50%; display: none;
+      align-items: center; justify-content: center;
+      background: linear-gradient(135deg, var(--crimson), #3d0009);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 46px; color: var(--gold); font-weight: 700;
+    }
+
+    /* Name + role */
+    .emp-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 34px; font-weight: 700; line-height: 1.15;
+      color: var(--text); letter-spacing: -0.5px; margin-bottom: 6px;
+      opacity: 0; animation: slideUp 0.5s 0.3s ease forwards;
+    }
+    .emp-role {
+      font-size: 12px; font-weight: 600; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--gold);
+      margin-bottom: 4px;
+      opacity: 0; animation: slideUp 0.5s 0.35s ease forwards;
+    }
+    .emp-company {
+      font-size: 12px; color: var(--muted); margin-bottom: 32px;
+      opacity: 0; animation: slideUp 0.5s 0.4s ease forwards;
+    }
+    .divider {
+      width: 50px; height: 1px; margin: 0 auto 36px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      opacity: 0; animation: slideUp 0.5s 0.45s ease forwards;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes zoomIn {
+      from { opacity: 0; transform: scale(0.7); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    /* ─── ACTION BUTTONS ─── */
+    .actions-wrap {
+      padding: 0 18px;
+      margin-bottom: 18px;
+      opacity: 0; animation: slideUp 0.5s 0.5s ease forwards;
+    }
+    .actions-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    .act-btn {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 7px;
+      padding: 14px 4px 12px;
+      border-radius: 18px; border: 1px solid var(--border2);
+      background: var(--glass);
+      text-decoration: none; cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+      transition: transform 0.18s, background 0.18s, border-color 0.18s;
+      position: relative; overflow: hidden;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .act-btn:hover { transform: translateY(-4px); background: var(--glass2); border-color: var(--border); }
+    .act-btn:active { transform: scale(0.93); }
+
+    .act-icon {
+      width: 42px; height: 42px; border-radius: 13px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 19px;
+      transition: transform 0.18s;
+    }
+    .act-btn:hover .act-icon { transform: scale(1.12); }
+    .act-label {
+      font-size: 9.5px; font-weight: 600; letter-spacing: 0.5px;
+      text-transform: uppercase; color: var(--muted);
+    }
+
+    /* Individual button colors */
+    .ic-call     { background: linear-gradient(135deg,#00c853,#009624); }
+    .ic-wa       { background: linear-gradient(135deg,#25d366,#075e54); }
+    .ic-email    { background: linear-gradient(135deg,#f44336,#b71c1c); }
+    .ic-web      { background: linear-gradient(135deg,#2979ff,#0039cb); }
+    .ic-loc      { background: linear-gradient(135deg,#ffab00,#e65100); }
+    .ic-save     { background: linear-gradient(135deg,var(--gold),#8b6220); }
+    .ic-share    { background: linear-gradient(135deg,#aa00ff,#6200ea); }
+    .ic-map      { background: linear-gradient(135deg,#ff6d00,#bf360c); }
+
+    /* Ripple */
+    .ripple-el {
+      position: absolute; border-radius: 50%;
+      background: rgba(255,255,255,0.18);
+      transform: scale(0); animation: ripple 0.55s ease-out forwards;
+      pointer-events: none;
+    }
+    @keyframes ripple { to { transform: scale(4); opacity: 0; } }
+
+    /* ─── GLASS PANELS ─── */
+    .panel {
+      margin: 0 18px 16px;
+      background: var(--glass);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      overflow: hidden;
+      transition: border-color 0.3s;
+    }
+    .panel:hover { border-color: rgba(212,168,67,0.25); }
+
+    /* Panel label */
+    .panel-label {
+      font-size: 9px; font-weight: 700; letter-spacing: 2.5px;
+      text-transform: uppercase; color: var(--gold);
+      opacity: 0.65; margin: 0 18px 10px; display: block;
+    }
+
+    /* ─── CONTACT ROWS ─── */
+    .contact-row {
+      display: flex; align-items: center; gap: 14px;
+      padding: 13px 18px;
+      text-decoration: none; color: inherit;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      transition: background 0.18s;
+    }
+    .contact-row:last-child { border-bottom: none; }
+    .contact-row:hover { background: rgba(212,168,67,0.05); }
+    .contact-row:active { background: rgba(212,168,67,0.1); }
+
+    .cr-icon {
+      width: 36px; height: 36px; border-radius: 11px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-size: 15px;
+    }
+    .cr-phone    { background: rgba(0,200,83,0.15); }
+    .cr-email-bg { background: rgba(244,67,54,0.15); }
+    .cr-web-bg   { background: rgba(41,121,255,0.15); }
+    .cr-loc-bg   { background: rgba(255,171,0,0.15); }
+
+    .cr-info { flex: 1; min-width: 0; }
+    .cr-label { font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 1px; }
+    .cr-value { font-size: 13.5px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cr-arrow { color: var(--gold); opacity: 0.4; font-size: 18px; flex-shrink: 0; }
+
+    /* ─── SOCIAL ROWS ─── */
+    .social-row {
+      display: flex; align-items: center; gap: 14px;
+      padding: 12px 18px;
+      text-decoration: none; color: inherit;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      transition: background 0.18s;
+    }
+    .social-row:last-child { border-bottom: none; }
+    .social-row:hover { background: rgba(255,255,255,0.03); }
+    .social-row:active { background: rgba(255,255,255,0.06); }
+
+    .si-wrap {
+      width: 36px; height: 36px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .si-fb { background: linear-gradient(135deg,#1877f2,#0b4db5); }
+    .si-li { background: linear-gradient(135deg,#0077b5,#004f79); }
+    .si-ig { background: linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045); }
+    .si-wa2 { background: linear-gradient(135deg,#25d366,#075e54); }
+
+    .si-text { flex: 1; }
+    .si-name { font-size: 13.5px; font-weight: 500; }
+    .si-sub  { font-size: 11px; color: var(--muted); margin-top: 1px; }
+    .si-chev { color: var(--gold); opacity: 0.35; font-size: 18px; }
+
+    /* ─── CATALOGUE CARD ─── */
+    .catalogue-card {
+      margin: 0 18px 16px;
+      display: flex; align-items: center; gap: 16px;
+      padding: 18px 20px;
+      text-decoration: none;
+      border-radius: var(--radius);
+      border: 1px solid rgba(212,168,67,0.3);
+      background: linear-gradient(135deg, rgba(212,168,67,0.08), rgba(139,26,46,0.12));
+      backdrop-filter: blur(16px);
+      position: relative; overflow: hidden;
+      transition: all 0.25s;
+    }
+    .catalogue-card::before {
+      content: '';
+      position: absolute; top: -60%; left: -20%; width: 140%; height: 220%;
+      background: radial-gradient(circle at 30% 50%, rgba(212,168,67,0.06) 0%, transparent 60%);
+      animation: shimmer 3s ease-in-out infinite alternate;
+    }
+    @keyframes shimmer { to { opacity: 0; } }
+    .catalogue-card:hover {
+      border-color: rgba(212,168,67,0.55);
+      transform: translateY(-2px);
+      box-shadow: 0 16px 48px rgba(212,168,67,0.12);
+    }
+    .cat-icon {
+      width: 52px; height: 52px; border-radius: 15px; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--gold), #7a5412);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; position: relative; z-index: 1;
+    }
+    .cat-text { flex: 1; position: relative; z-index: 1; }
+    .cat-title { font-size: 15px; font-weight: 600; color: var(--gold); }
+    .cat-sub   { font-size: 11.5px; color: var(--muted); margin-top: 3px; }
+    .cat-arrow { font-size: 22px; color: var(--gold); opacity: 0.55; position: relative; z-index: 1; }
+
+    /* ─── QR SECTION ─── */
+    .qr-panel {
+      margin: 0 18px 16px;
+      background: var(--glass);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius);
+      backdrop-filter: blur(16px);
+      display: flex; flex-direction: column; align-items: center;
+      padding: 28px 24px;
+      gap: 14px;
+    }
+    .qr-badge {
+      font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase;
+      color: var(--gold); opacity: 0.6; font-weight: 700;
+    }
+    .qr-frame {
+      padding: 10px; background: white; border-radius: 16px;
+      box-shadow: 0 0 0 1px rgba(212,168,67,0.3), 0 12px 40px rgba(0,0,0,0.5);
+    }
+    .qr-img { width: 152px; height: 152px; display: block; border-radius: 8px; }
+    .qr-sub { font-size: 12px; color: var(--muted); text-align: center; }
+
+    /* ─── FOOTER ─── */
+    .card-footer {
+      text-align: center; padding: 20px;
+      border-top: 1px solid rgba(255,255,255,0.04);
+      margin: 8px 18px 0;
+    }
+    .footer-name { font-family: 'Cormorant Garamond', serif; font-size: 15px; color: var(--gold); opacity: 0.75; }
+    .footer-tag  { font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-top: 3px; }
+
+    /* ─── TOAST ─── */
+    .toast-wrap {
+      position: fixed; bottom: 28px; left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(10,22,40,0.92);
+      border: 1px solid rgba(212,168,67,0.35);
+      color: var(--gold); padding: 12px 24px;
+      border-radius: 40px; font-size: 13px; font-weight: 500;
+      z-index: 999; opacity: 0; pointer-events: none;
+      backdrop-filter: blur(20px);
+      white-space: nowrap;
+      transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .toast-wrap.show {
+      opacity: 1; transform: translateX(-50%) translateY(0);
+    }
+
+    /* ─── SECTION REVEALS ─── */
+    .reveal {
+      opacity: 0; transform: translateY(18px);
+      transition: opacity 0.55s ease, transform 0.55s ease;
+    }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+
+    /* ─── SCROLLBAR ─── */
+    ::-webkit-scrollbar { width: 0; }
+  </style>
 </head>
 <body>
-  <div class="card-page">
 
-    <!-- LOADING STATE -->
-    <div id="loadingState" style="display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:12px">
-      <div style="font-size:36px">⏳</div>
-      <div style="font-size:14px;color:#666">Loading card…</div>
+<div class="bg-canvas"></div>
+
+<!-- LOADING -->
+<div id="loadingState">
+  <div class="spinner"></div>
+  <div class="load-text">Loading Card</div>
+</div>
+
+<!-- ERROR -->
+<div id="errorState">
+  <div class="err-icon">✦</div>
+  <div class="err-head">Card Unavailable</div>
+  <div class="err-body" id="errorMsg">This card link may be invalid or expired.</div>
+</div>
+
+<!-- CARD -->
+<div class="card-wrap" id="digitalCard" style="display:none">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="company-strip">
+      <img class="co-logo" id="cardLogo" src="mrk_logo.jpg" alt="MRK" onerror="this.style.display='none'">
+      <span class="co-name">MRK Foods Private Limited</span>
     </div>
 
-    <!-- ERROR STATE -->
-    <div id="errorState" style="display:none;align-items:center;justify-content:center;flex-direction:column">
-      <div class="error-card">
-        <div class="error-icon">❌</div>
-        <h2 class="error-title">Card Not Found</h2>
-        <p class="error-msg" id="errorMsg">This card link may be invalid or expired.</p>
-      </div>
+    <div class="avatar-container">
+      <div class="avatar-ring-outer"></div>
+      <div class="avatar-ring-inner"></div>
+      <img id="cardPhoto" class="avatar-img" src="" alt="" style="display:none">
+      <div id="cardInitials" class="avatar-initials"></div>
     </div>
 
-    <!-- DIGITAL CARD -->
-    <div class="digital-card" id="digitalCard" style="display:none">
+    <h1 class="emp-name"  id="cardName"></h1>
+    <div class="emp-role" id="cardDesignation"></div>
+    <div class="emp-company">MRK Foods Private Limited</div>
+    <div class="divider"></div>
+  </div>
 
-      <!-- Card Header -->
-      <div class="card-header">
-        <img id="cardLogo" class="card-company-logo" src="mrk_logo.jpg" alt="MRK Foods" onerror="this.style.display='none'">
-        <div class="card-company-name">
-          <span class="company-full-name">MRK Foods Private Limited</span>
-        </div>
+  <!-- ACTION BUTTONS -->
+  <div class="actions-wrap">
+    <div class="actions-grid" id="actionsGrid">
+      <a id="btnCall" class="act-btn" href="#">
+        <div class="act-icon ic-call"><svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg></div>
+        <span class="act-label">Call</span>
+      </a>
+      <a id="btnWhatsApp" class="act-btn" href="#" target="_blank">
+        <div class="act-icon ic-wa"><svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg></div>
+        <span class="act-label">WhatsApp</span>
+      </a>
+      <a id="btnEmail" class="act-btn" href="#">
+        <div class="act-icon ic-email"><svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg></div>
+        <span class="act-label">Email</span>
+      </a>
+      <a id="btnWeb" class="act-btn" href="#" target="_blank">
+        <div class="act-icon ic-web"><svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg></div>
+        <span class="act-label">Website</span>
+      </a>
+      <button id="btnSave" class="act-btn">
+        <div class="act-icon ic-save"><svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg></div>
+        <span class="act-label">Save</span>
+      </button>
+      <button id="btnShare" class="act-btn">
+        <div class="act-icon ic-share"><svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg></div>
+        <span class="act-label">Share</span>
+      </button>
+      <a id="btnLocation" class="act-btn" href="#" target="_blank">
+        <div class="act-icon ic-loc"><svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg></div>
+        <span class="act-label">Location</span>
+      </a>
+      <a id="btnMap" class="act-btn" href="https://maps.google.com/?q=MRK+Foods+Mumbai" target="_blank">
+        <div class="act-icon ic-map"><svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></svg></div>
+        <span class="act-label">Map</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- CONTACT DETAILS PANEL -->
+  <div class="reveal" style="transition-delay:0.05s">
+    <div class="panel" id="contactPanel"></div>
+  </div>
+
+  <!-- SOCIAL PANEL -->
+  <div class="reveal" id="socialSection" style="display:none;transition-delay:0.1s">
+    <span class="panel-label" style="margin-top:6px">Connect Online</span>
+    <div class="panel" id="socialPanel"></div>
+  </div>
+
+  <!-- CATALOGUE -->
+  <div class="reveal" id="catalogueSection" style="display:none;transition-delay:0.15s">
+    <a class="catalogue-card" id="btnCatalogue" href="#" target="_blank">
+      <div class="cat-icon">📁</div>
+      <div class="cat-text">
+        <div class="cat-title">View Product Catalogue</div>
+        <div class="cat-sub">Tap to browse our full product range</div>
       </div>
+      <span class="cat-arrow">›</span>
+    </a>
+  </div>
 
-      <!-- Card Body -->
-      <div class="card-body">
-
-        <!-- Employee Photo -->
-        <div class="card-photo-wrapper">
-          <img id="cardPhoto" class="card-photo" src="" alt="Employee" style="display:none">
-          <div id="cardPhotoPlaceholder" class="card-photo-placeholder" style="display:none"></div>
-        </div>
-
-        <!-- Name & Role -->
-        <h1 class="card-name" id="cardName"></h1>
-        <p class="card-designation" id="cardDesignation"></p>
-        <div class="card-divider"></div>
-
-        <!-- Contact Info -->
-        <ul class="contact-list" id="contactList"></ul>
-
-        <!-- Action Buttons -->
-        <div class="action-grid">
-          <a id="btnWhatsapp" class="action-btn btn-whatsapp" href="#" target="_blank">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-            WhatsApp
-          </a>
-          <a id="btnCall" class="action-btn btn-call" href="#">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
-            Call
-          </a>
-          <a id="btnEmail" class="action-btn btn-email" href="#">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
-            Email
-          </a>
-          <button id="btnSave" class="action-btn btn-save">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-            Save Contact
-          </button>
-        </div>
-
-        <button id="btnShare" class="action-btn btn-share" style="width:100%;margin-bottom:12px">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
-          Share Card
-        </button>
-
-        <!-- Catalogue Button -->
-        <a id="btnCatalogue" class="btn-catalogue" href="#" target="_blank">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-          View Product Catalogue
-        </a>
-
-        <!-- QR Section -->
-        <div class="qr-section">
-          <div class="qr-title">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 11h8V3H3v8zm2-6h4v4H5V5zm8-2v8h8V3h-8zm6 6h-4V5h4v4zM3 21h8v-8H3v8zm2-6h4v4H5v-4zm13-2h-2v2h2v-2zm0 4h-2v2h2v-2zm2 0h-2v2h2v-2zm-4 0h-2v2h2v-2zm2-4h-2v2h2v-2zm2-2h-2v2h2v-2zm0 8h-2v2h2v-2zm2-2h-2v2h2v-2z"/></svg>
-            Scan to Save Contact
-          </div>
-          <img id="cardQR" class="qr-code-img" src="" alt="QR Code">
-        </div>
-
-        <!-- Social Icons -->
-        <div class="social-row">
-          <a id="socialFb" class="social-btn social-fb" href="#" target="_blank" title="Facebook">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-          </a>
-          <a id="socialLn" class="social-btn social-ln" href="#" target="_blank" title="LinkedIn">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-          </a>
-          <a id="socialWa" class="social-btn social-wa" href="#" target="_blank" title="WhatsApp">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-          </a>
-          <a id="socialIg" class="social-btn social-ig" href="#" target="_blank" title="Instagram">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
-          </a>
-        </div>
-
-      </div><!-- /card-body -->
-
-      <!-- Card Footer -->
-      <div class="card-footer">
-        <div class="card-footer-brand">MRK Foods Private Limited</div>
-        <div class="card-footer-sub">Digital Visiting Card</div>
+  <!-- QR PANEL -->
+  <div class="reveal" style="transition-delay:0.2s">
+    <div class="qr-panel">
+      <span class="qr-badge">Scan to Save Contact</span>
+      <div class="qr-frame">
+        <img id="cardQR" class="qr-img" src="" alt="QR Code">
       </div>
+      <span class="qr-sub">Point your camera here</span>
+    </div>
+  </div>
 
-    </div><!-- /digital-card -->
+  <!-- FOOTER -->
+  <div class="card-footer">
+    <div class="footer-name">MRK Foods Private Limited</div>
+    <div class="footer-tag">Digital Visiting Card</div>
+  </div>
 
-  </div><!-- /card-page -->
+</div>
 
-  <!-- Firebase SDKs (compat v9) — must load BEFORE card.js -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-  <script src="firebase-config.js"></script>
-  <script>
-    // Hide loading state once Firebase is ready (DOMContentLoaded triggers initCard in card.js)
-    document.getElementById('loadingState').style.display = 'flex';
-  </script>
-  <script src="card.js"></script>
-  <script>
-    // Override initCard to hide loading before rendering
-    const _origInitCard = initCard;
-    // card.js calls initCard on DOMContentLoaded — we just hide the loader after
-    document.addEventListener('DOMContentLoaded', function() {
-      document.getElementById('loadingState').style.display = 'none';
-    });
-  </script>
+<div class="toast-wrap" id="toast"></div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+
+<script>
+/* ── helpers ── */
+const esc = s => s ? String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : '';
+const $ = id => document.getElementById(id);
+
+function toast(msg, dur = 3000) {
+  const t = $('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), dur);
+}
+
+/* ── ripple ── */
+document.querySelectorAll('.act-btn').forEach(btn => {
+  btn.addEventListener('pointerdown', e => {
+    const r = document.createElement('span');
+    r.className = 'ripple-el';
+    const rect = btn.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height);
+    r.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX-rect.left-size/2}px;top:${e.clientY-rect.top-size/2}px`;
+    btn.appendChild(r);
+    setTimeout(() => r.remove(), 600);
+  });
+});
+
+/* ── scroll reveals ── */
+const io = new IntersectionObserver(es => {
+  es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); } });
+}, { threshold: 0.08 });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+/* ── INIT ── */
+async function initCard() {
+  const id = new URLSearchParams(location.search).get('id');
+  if (!id) { showErr('No employee ID provided.'); return; }
+
+  try {
+    const snap = await db.collection('employees').doc(id).get();
+    if (!snap.exists) { showErr('This card doesn\'t exist. Check the link.'); return; }
+    render({ id: snap.id, ...snap.data() });
+  } catch(e) {
+    console.error(e);
+    showErr('Failed to load card. Please try again.');
+  } finally {
+    $('loadingState').style.display = 'none';
+  }
+}
+
+/* ── RENDER ── */
+function render(emp) {
+  $('errorState').style.display = 'none';
+  $('digitalCard').style.display = 'block';
+  document.title = `${emp.name} — MRK Foods`;
+
+  /* Logo */
+  if (emp.logoURL) $('cardLogo').src = emp.logoURL;
+
+  /* Photo / initials */
+  if (emp.photoURL) {
+    $('cardPhoto').src = emp.photoURL;
+    $('cardPhoto').style.display = 'block';
+  } else {
+    const init = emp.name ? emp.name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase() : '?';
+    const pl = $('cardInitials');
+    pl.textContent = init; pl.style.display = 'flex';
+  }
+
+  $('cardName').textContent        = emp.name || '';
+  $('cardDesignation').textContent = emp.designation || '';
+
+  /* Contact panel */
+  let ch = '';
+  if (emp.mobile)  ch += row('cr-phone', '📞', 'Mobile',   emp.mobile,   `tel:${emp.mobile}`);
+  if (emp.email)   ch += row('cr-email-bg', '✉️', 'Email', emp.email,    `mailto:${emp.email}`);
+  if (emp.website) {
+    const url = emp.website.startsWith('http') ? emp.website : 'https://'+emp.website;
+    ch += row('cr-web-bg', '🌐', 'Website', emp.website, url, true);
+  }
+  if (emp.address) {
+    const gurl = `https://maps.google.com/?q=${encodeURIComponent(emp.address)}`;
+    ch += row('cr-loc-bg', '📍', 'Address', emp.address, gurl, true);
+  }
+  $('contactPanel').innerHTML = ch;
+
+  /* Action buttons */
+  const wa = emp.whatsapp || emp.mobile;
+  const setA = (id, href, target) => { const el=$(id); if(el){ el.href=href; if(target) el.target=target; } };
+  if (emp.mobile)  setA('btnCall', `tel:${emp.mobile}`);
+  else             $('btnCall')?.remove();
+  if (wa)          setA('btnWhatsApp', `https://wa.me/${wa.replace(/\D/g,'')}`, '_blank');
+  else             $('btnWhatsApp')?.remove();
+  if (emp.email)   setA('btnEmail', `mailto:${emp.email}`);
+  else             $('btnEmail')?.remove();
+  if (emp.website){ const u=emp.website.startsWith('http')?emp.website:'https://'+emp.website; setA('btnWeb', u,'_blank'); }
+  else             $('btnWeb')?.remove();
+  if (emp.address) setA('btnLocation', `https://maps.google.com/?q=${encodeURIComponent(emp.address)}`, '_blank');
+  else             $('btnLocation')?.remove();
+
+  $('btnSave').onclick  = () => saveVCF(emp);
+  $('btnShare').onclick = () => shareCard(emp);
+
+  /* Social panel */
+  let sh = '';
+  if (emp.facebook)  sh += social('si-fb',  fbIcon(),  'Facebook',  'Follow us on Facebook',  emp.facebook);
+  if (emp.linkedin)  sh += social('si-li',  liIcon(),  'LinkedIn',  'Connect on LinkedIn',     emp.linkedin);
+  if (emp.instagram) sh += social('si-ig',  igIcon(),  'Instagram', 'Follow on Instagram',     emp.instagram);
+  if (wa)            sh += social('si-wa2', waIcon(),  'WhatsApp',  'Chat on WhatsApp',        `https://wa.me/${wa.replace(/\D/g,'')}`);
+  if (sh) { $('socialPanel').innerHTML = sh; $('socialSection').style.display = 'block'; }
+
+  /* Catalogue */
+  if (emp.catalogueLink) {
+    const url = emp.catalogueLink.startsWith('http') ? emp.catalogueLink : 'https://'+emp.catalogueLink;
+    $('btnCatalogue').href = url;
+    $('catalogueSection').style.display = 'block';
+  }
+
+  /* QR */
+  $('cardQR').src = `https://api.qrserver.com/v1/create-qr-code/?size=152x152&data=${encodeURIComponent(location.href)}&color=050d1a&bgcolor=ffffff&qzone=1`;
+
+  /* Re-observe new reveals */
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+}
+
+function row(cls, emoji, label, value, href, external=false) {
+  const t = external ? ' target="_blank"' : '';
+  return `<a class="contact-row" href="${esc(href)}"${t}>
+    <div class="cr-icon ${cls}">${emoji}</div>
+    <div class="cr-info">
+      <div class="cr-label">${label}</div>
+      <div class="cr-value">${esc(value)}</div>
+    </div>
+    <span class="cr-arrow">›</span>
+  </a>`;
+}
+
+function social(iconCls, svgIcon, name, sub, href) {
+  return `<a class="social-row" href="${esc(href)}" target="_blank">
+    <div class="si-wrap ${iconCls}">${svgIcon}</div>
+    <div class="si-text">
+      <div class="si-name">${name}</div>
+      <div class="si-sub">${sub}</div>
+    </div>
+    <span class="si-chev">›</span>
+  </a>`;
+}
+
+/* ── SVG ICONS ── */
+function fbIcon(){ return `<svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>`; }
+function liIcon(){ return `<svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>`; }
+function igIcon(){ return `<svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>`; }
+function waIcon(){ return `<svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>`; }
+
+/* ── SAVE VCF ── */
+function saveVCF(emp) {
+  const lines = [
+    'BEGIN:VCARD','VERSION:3.0',
+    `FN:${emp.name||''}`,
+    `N:${(emp.name||'').split(' ').reverse().join(';')}`,
+    emp.mobile      ? `TEL;TYPE=CELL:${emp.mobile}` : '',
+    emp.email       ? `EMAIL:${emp.email}` : '',
+    emp.website     ? `URL:${emp.website}` : '',
+    emp.designation ? `TITLE:${emp.designation}` : '',
+    'ORG:MRK Foods Private Limited',
+    emp.address     ? `ADR;TYPE=WORK:;;${emp.address}` : '',
+  ].filter(Boolean).join('\r\n') + '\r\nEND:VCARD';
+
+  const a = Object.assign(document.createElement('a'), {
+    href: URL.createObjectURL(new Blob([lines], {type:'text/vcard'})),
+    download: `${(emp.name||'contact').replace(/\s+/g,'_')}.vcf`
+  });
+  a.click(); URL.revokeObjectURL(a.href);
+  toast('✓ Contact saved to your device');
+}
+
+/* ── SHARE ── */
+async function shareCard(emp) {
+  const url = location.href;
+  if (navigator.share) {
+    try { await navigator.share({ title: `${emp.name} — MRK Foods`, url }); return; } catch(_) {}
+  }
+  await navigator.clipboard.writeText(url);
+  toast('✓ Link copied to clipboard');
+}
+
+function showErr(msg) {
+  $('errorState').style.display = 'flex';
+  $('errorMsg').textContent = msg;
+}
+
+document.addEventListener('DOMContentLoaded', initCard);
+</script>
 </body>
 </html>
