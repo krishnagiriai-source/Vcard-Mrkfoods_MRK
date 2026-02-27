@@ -33,7 +33,6 @@
   <!-- MAIN CONTENT -->
   <div class="container" style="display:none" id="mainContent">
 
-    <!-- Page Header -->
     <div class="page-header">
       <h1 class="page-title">Employee Cards</h1>
       <p class="page-subtitle">Manage digital visiting cards for your team — changes sync instantly worldwide ☁️</p>
@@ -65,9 +64,7 @@
     <div class="card-section">
       <div class="section-header">
         <h2 class="section-title">👥 All Employees</h2>
-        <button class="btn btn-maroon" onclick="openModal('empModal')">
-          ➕ Add New Employee
-        </button>
+        <button class="btn btn-maroon" onclick="openModal('empModal')">➕ Add New Employee</button>
       </div>
 
       <div id="emptyState" class="empty-state" style="display:none">
@@ -75,9 +72,7 @@
         <p>No employees yet. Click <strong>Add New Employee</strong> to get started.</p>
       </div>
 
-      <div id="listLoader" style="text-align:center;padding:40px;color:#888;display:none">
-        ⏳ Loading employees…
-      </div>
+      <div id="listLoader" style="text-align:center;padding:40px;color:#888;display:none">⏳ Loading employees…</div>
 
       <div style="overflow-x:auto">
         <table class="emp-table">
@@ -94,7 +89,7 @@
       </div>
     </div>
 
-    <!-- Instructions -->
+    <!-- How It Works -->
     <div class="card-section">
       <div class="section-header">
         <h2 class="section-title">📖 How It Works</h2>
@@ -125,13 +120,16 @@
 
   </div><!-- /container -->
 
-  <!-- ============ ADD/EDIT EMPLOYEE MODAL ============ -->
+  <!-- ══════════════════════════════════════════════
+       ADD / EDIT EMPLOYEE MODAL
+  ══════════════════════════════════════════════ -->
   <div class="modal-overlay" id="empModal">
     <div class="modal">
       <div class="modal-header">
         <h3 class="modal-title" id="modalTitle">Add New Employee</h3>
         <button class="modal-close" onclick="closeModal('empModal')">✕</button>
       </div>
+
       <div class="modal-body">
         <input type="hidden" id="empId">
         <form id="empForm" onsubmit="event.preventDefault(); saveEmployee()">
@@ -178,9 +176,25 @@
             </div>
           </div>
 
+          <!-- Address -->
           <div class="form-group">
             <label>Full Address</label>
             <textarea id="empAddress" placeholder="Vijay House, Ground Floor, Devidayal Compound, near Samriddhi Garden, Bhandup West, Mumbai, Maharashtra 400078"></textarea>
+          </div>
+
+          <!-- ══ FIX 5 — NEW FIELD: Google Location Link ══ -->
+          <div style="background:linear-gradient(135deg,rgba(66,133,244,0.07),rgba(15,60,110,0.05));border:2px dashed rgba(66,133,244,0.4);border-radius:12px;padding:20px;margin-bottom:20px">
+            <div style="font-size:13px;font-weight:600;color:#1565c0;margin-bottom:10px">
+              📍 Google Location Link
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+              <label>Paste your Google Maps link (opens when customer taps Location button)</label>
+              <input type="url" id="empGoogleLocationLink"
+                     placeholder="https://maps.app.goo.gl/... or https://goo.gl/maps/...">
+            </div>
+            <p style="font-size:12px;color:var(--gray-600);margin-top:8px">
+              💡 Tip: Open Google Maps → Search your location → Share → Copy link. Paste it here.
+            </p>
           </div>
 
           <!-- Social Links -->
@@ -214,7 +228,7 @@
             </p>
           </div>
 
-          <!-- Company Logo Override -->
+          <!-- Logo Override -->
           <div style="margin-bottom:8px">
             <div style="font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--gray-600);margin-bottom:8px">Company Logo Override (optional)</div>
             <div class="form-group">
@@ -226,6 +240,7 @@
 
         </form>
       </div>
+
       <div class="modal-footer">
         <button class="btn btn-secondary" onclick="closeModal('empModal')">Cancel</button>
         <button class="btn btn-maroon" id="saveEmpBtn" onclick="saveEmployee()">💾 Save Employee Card</button>
@@ -233,7 +248,7 @@
     </div>
   </div>
 
-  <!-- ============ QR MODAL ============ -->
+  <!-- QR MODAL -->
   <div class="modal-overlay" id="qrModal">
     <div class="modal" style="max-width:480px">
       <div class="modal-header">
@@ -256,10 +271,9 @@
     </div>
   </div>
 
-  <!-- Toast -->
   <div class="toast" id="toast"></div>
 
-  <!-- Firebase SDKs (compat v9) -->
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
