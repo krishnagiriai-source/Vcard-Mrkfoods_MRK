@@ -10,25 +10,22 @@ let unsubscribeListener = null;
 
 // ============================================
 // CLOUDINARY CONFIG (FREE photo hosting)
-// Sign up FREE at cloudinary.com
-// Fill in your Cloud Name and Upload Preset below
+// Sign up FREE at cloudinary.com — no credit card
 // ============================================
-const CLOUDINARY_CLOUD_NAME  = 'YOUR_CLOUD_NAME';   // e.g. 'mrkfoods'
-const CLOUDINARY_UPLOAD_PRESET = 'YOUR_UPLOAD_PRESET'; // e.g. 'mrk_unsigned'
-const CLOUDINARY_UPLOAD_URL  = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
+const CLOUDINARY_CLOUD_NAME    = 'YOUR_CLOUD_NAME';      // e.g. 'mrkfoods'
+const CLOUDINARY_UPLOAD_PRESET = 'YOUR_UPLOAD_PRESET';   // e.g. 'mrk_unsigned'
+const CLOUDINARY_UPLOAD_URL    = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
 
-// Upload image to Cloudinary — returns permanent URL
 async function uploadToCloudinary(file, folder = 'employees') {
   const formData = new FormData();
   formData.append('file', file);
   formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
   formData.append('folder', folder);
-  formData.append('transformation', 'w_800,q_75,f_auto'); // auto compress
 
   const res  = await fetch(CLOUDINARY_UPLOAD_URL, { method: 'POST', body: formData });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error?.message || 'Cloudinary upload failed');
-  return data.secure_url; // permanent HTTPS URL
+  return data.secure_url;
 }
 
 // ============================================
@@ -67,8 +64,7 @@ function initDashboard() {
         const url = URL.createObjectURL(this.files[0]);
         const preview = document.getElementById('photoPreview');
         const placeholder = document.getElementById('photoPlaceholder');
-        preview.src = url;
-        preview.style.display = 'block';
+        preview.src = url; preview.style.display = 'block';
         if (placeholder) placeholder.style.display = 'none';
       }
     });
@@ -193,21 +189,22 @@ async function saveEmployee() {
 
   try {
     const empData = {
-      name:          name,
-      designation:   document.getElementById('empDesignation').value.trim(),
-      mobile:        document.getElementById('empMobile').value.trim(),
-      email:         document.getElementById('empEmail').value.trim(),
-      website:       document.getElementById('empWebsite').value.trim(),
-      address:       document.getElementById('empAddress').value.trim(),
-      whatsapp:      document.getElementById('empWhatsapp').value.trim(),
-      facebook:      document.getElementById('empFacebook').value.trim(),
-      linkedin:      document.getElementById('empLinkedin').value.trim(),
-      instagram:     document.getElementById('empInstagram').value.trim(),
-      catalogueLink: document.getElementById('empCatalogueLink').value.trim(),
-      updatedAt:     firebase.firestore.FieldValue.serverTimestamp(),
+      name:                name,
+      designation:         document.getElementById('empDesignation').value.trim(),
+      mobile:              document.getElementById('empMobile').value.trim(),
+      email:               document.getElementById('empEmail').value.trim(),
+      website:             document.getElementById('empWebsite').value.trim(),
+      address:             document.getElementById('empAddress').value.trim(),
+      whatsapp:            document.getElementById('empWhatsapp').value.trim(),
+      googleLocationLink:  document.getElementById('empGoogleLocationLink')?.value.trim() || '', // FIX 5
+      facebook:            document.getElementById('empFacebook').value.trim(),
+      linkedin:            document.getElementById('empLinkedin').value.trim(),
+      instagram:           document.getElementById('empInstagram').value.trim(),
+      catalogueLink:       document.getElementById('empCatalogueLink').value.trim(),
+      updatedAt:           firebase.firestore.FieldValue.serverTimestamp(),
     };
 
-    // ---- Upload photo to Cloudinary (FREE) ----
+    // Photo upload
     const photoInput = document.getElementById('empPhoto');
     if (photoInput && photoInput.files[0]) {
       showToast('Uploading photo…', 'success');
@@ -218,7 +215,7 @@ async function saveEmployee() {
       }
     }
 
-    // ---- Upload logo to Cloudinary ----
+    // Logo upload
     const logoInput = document.getElementById('companyLogoOverride');
     if (logoInput && logoInput.files[0]) {
       try {
@@ -227,11 +224,9 @@ async function saveEmployee() {
     }
 
     if (empId) {
-      // UPDATE existing
       await db.collection(EMPLOYEES_COL).doc(empId).update(empData);
       showToast('Employee updated successfully!', 'success');
     } else {
-      // CREATE new
       empData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
       await db.collection(EMPLOYEES_COL).add(empData);
       showToast('Employee created successfully!', 'success');
@@ -265,6 +260,11 @@ async function editEmployee(id) {
     document.getElementById('empWebsite').value       = emp.website || '';
     document.getElementById('empAddress').value       = emp.address || '';
     document.getElementById('empWhatsapp').value      = emp.whatsapp || '';
+
+    // FIX 5 — populate Google Location Link
+    const locEl = document.getElementById('empGoogleLocationLink');
+    if (locEl) locEl.value = emp.googleLocationLink || '';
+
     document.getElementById('empFacebook').value      = emp.facebook || '';
     document.getElementById('empLinkedin').value      = emp.linkedin || '';
     document.getElementById('empInstagram').value     = emp.instagram || '';
@@ -273,8 +273,7 @@ async function editEmployee(id) {
     if (emp.photoURL) {
       const preview     = document.getElementById('photoPreview');
       const placeholder = document.getElementById('photoPlaceholder');
-      preview.src = emp.photoURL;
-      preview.style.display = 'block';
+      preview.src = emp.photoURL; preview.style.display = 'block';
       if (placeholder) placeholder.style.display = 'none';
     }
 
@@ -324,8 +323,7 @@ async function downloadQR() {
     const a    = document.createElement('a');
     a.href = url;
     a.download = document.getElementById('qrEmpName').textContent.replace(/\s+/g,'_') + '_QR.png';
-    a.click();
-    URL.revokeObjectURL(url);
+    a.click(); URL.revokeObjectURL(url);
     showToast('QR downloaded!', 'success');
   } catch { showToast('Right-click QR to save.', 'error'); }
 }
@@ -363,12 +361,18 @@ function resetForm() {
   if (form) form.reset();
   document.getElementById('empId').value = '';
   document.getElementById('modalTitle').textContent = 'Add New Employee';
+
   const preview     = document.getElementById('photoPreview');
   const placeholder = document.getElementById('photoPlaceholder');
   if (preview)     { preview.style.display = 'none'; preview.src = ''; }
   if (placeholder)   placeholder.style.display = 'flex';
+
   const logoPrev = document.getElementById('logoPreviewImg');
   if (logoPrev)  { logoPrev.style.display = 'none'; logoPrev.src = ''; }
+
+  // Reset Google Location Link field
+  const locEl = document.getElementById('empGoogleLocationLink');
+  if (locEl) locEl.value = '';
 }
 
 function showToast(msg, type = 'success') {
