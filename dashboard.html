@@ -9,7 +9,6 @@
 </head>
 <body class="dashboard-body">
 
-  <!-- TOP BAR -->
   <nav class="topbar">
     <div class="topbar-brand">
       <img src="mrk_logo.jpg" alt="MRK Foods" onerror="this.style.display='none'">
@@ -24,21 +23,17 @@
     </div>
   </nav>
 
-  <!-- LOADING OVERLAY -->
   <div id="pageLoader" style="position:fixed;inset:0;background:rgba(255,255,255,0.9);display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column;gap:12px">
     <div style="font-size:32px">⏳</div>
     <div style="font-size:15px;color:#555">Loading dashboard…</div>
   </div>
 
-  <!-- MAIN CONTENT -->
   <div class="container" style="display:none" id="mainContent">
-
     <div class="page-header">
       <h1 class="page-title">Employee Cards</h1>
       <p class="page-subtitle">Manage digital visiting cards for your team — changes sync instantly worldwide ☁️</p>
     </div>
 
-    <!-- Cloud Sync Banner -->
     <div style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9);border:2px solid #4e7c2a;border-radius:14px;padding:16px 22px;margin-bottom:24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
       <div style="font-size:26px">✅</div>
       <div style="flex:1;min-width:200px">
@@ -48,7 +43,6 @@
       <div style="background:#4e7c2a;color:white;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:600">🔴 Live</div>
     </div>
 
-    <!-- Stats -->
     <div class="stats-grid">
       <div class="stat-card">
         <div class="stat-number" id="statTotal">–</div>
@@ -60,40 +54,26 @@
       </div>
     </div>
 
-    <!-- Employee List -->
     <div class="card-section">
       <div class="section-header">
         <h2 class="section-title">👥 All Employees</h2>
         <button class="btn btn-maroon" onclick="openModal('empModal')">➕ Add New Employee</button>
       </div>
-
       <div id="emptyState" class="empty-state" style="display:none">
         <div class="empty-icon">👤</div>
         <p>No employees yet. Click <strong>Add New Employee</strong> to get started.</p>
       </div>
-
       <div id="listLoader" style="text-align:center;padding:40px;color:#888;display:none">⏳ Loading employees…</div>
-
       <div style="overflow-x:auto">
         <table class="emp-table">
-          <thead>
-            <tr>
-              <th>Employee</th>
-              <th>Mobile</th>
-              <th>Designation</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
+          <thead><tr><th>Employee</th><th>Mobile</th><th>Designation</th><th>Actions</th></tr></thead>
           <tbody id="empTableBody"></tbody>
         </table>
       </div>
     </div>
 
-    <!-- How It Works -->
     <div class="card-section">
-      <div class="section-header">
-        <h2 class="section-title">📖 How It Works</h2>
-      </div>
+      <div class="section-header"><h2 class="section-title">📖 How It Works</h2></div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px">
         <div style="background:var(--gray-100);padding:20px;border-radius:12px">
           <div style="font-size:28px;margin-bottom:8px">1️⃣</div>
@@ -117,28 +97,33 @@
         </div>
       </div>
     </div>
+  </div>
 
-  </div><!-- /container -->
-
-  <!-- ══════════════════════════════════════════════
-       ADD / EDIT EMPLOYEE MODAL
-  ══════════════════════════════════════════════ -->
+  <!-- ════════════════════════════════════════════
+       EMPLOYEE MODAL
+       KEY FIX: <input type="hidden" id="existingPhotoURL">
+       This hidden field stores the current Cloudinary URL
+       so it is NOT lost when saving without a new photo.
+  ════════════════════════════════════════════ -->
   <div class="modal-overlay" id="empModal">
     <div class="modal">
       <div class="modal-header">
         <h3 class="modal-title" id="modalTitle">Add New Employee</h3>
         <button class="modal-close" onclick="closeModal('empModal')">✕</button>
       </div>
-
       <div class="modal-body">
         <input type="hidden" id="empId">
+        <!-- CRITICAL: preserves Cloudinary photo URL across edits -->
+        <input type="hidden" id="existingPhotoURL">
+
         <form id="empForm" onsubmit="event.preventDefault(); saveEmployee()">
 
           <!-- Photo Upload -->
           <div style="margin-bottom:24px">
             <label style="display:block;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--gray-600);margin-bottom:8px">Employee Photo</label>
             <div class="photo-upload-area" onclick="document.getElementById('empPhoto').click()">
-              <img id="photoPreview" class="photo-preview" src="" alt="Preview" style="display:none">
+              <img id="photoPreview" class="photo-preview" src="" alt="Preview"
+                   style="display:none;border-radius:50%;object-fit:cover;object-position:top center;width:120px;height:120px;margin:0 auto">
               <div id="photoPlaceholder" class="upload-placeholder" style="display:flex;flex-direction:column;align-items:center">
                 <span class="upload-icon">📷</span>
                 <span>Click to upload employee photo</span>
@@ -148,7 +133,6 @@
             </div>
           </div>
 
-          <!-- Basic Info -->
           <div class="form-grid">
             <div class="form-group">
               <label>Employee Name *</label>
@@ -176,28 +160,20 @@
             </div>
           </div>
 
-          <!-- Address -->
           <div class="form-group">
             <label>Full Address</label>
             <textarea id="empAddress" placeholder="Vijay House, Ground Floor, Devidayal Compound, near Samriddhi Garden, Bhandup West, Mumbai, Maharashtra 400078"></textarea>
           </div>
 
-          <!-- ══ FIX 5 — NEW FIELD: Google Location Link ══ -->
           <div style="background:linear-gradient(135deg,rgba(66,133,244,0.07),rgba(15,60,110,0.05));border:2px dashed rgba(66,133,244,0.4);border-radius:12px;padding:20px;margin-bottom:20px">
-            <div style="font-size:13px;font-weight:600;color:#1565c0;margin-bottom:10px">
-              📍 Google Location Link
-            </div>
+            <div style="font-size:13px;font-weight:600;color:#1565c0;margin-bottom:10px">📍 Google Location Link</div>
             <div class="form-group" style="margin-bottom:0">
               <label>Paste your Google Maps link (opens when customer taps Location button)</label>
-              <input type="url" id="empGoogleLocationLink"
-                     placeholder="https://maps.app.goo.gl/... or https://goo.gl/maps/...">
+              <input type="url" id="empGoogleLocationLink" placeholder="https://maps.app.goo.gl/...">
             </div>
-            <p style="font-size:12px;color:var(--gray-600);margin-top:8px">
-              💡 Tip: Open Google Maps → Search your location → Share → Copy link. Paste it here.
-            </p>
+            <p style="font-size:12px;color:var(--gray-600);margin-top:8px">💡 Tip: Open Google Maps → Search your location → Share → Copy link. Paste it here.</p>
           </div>
 
-          <!-- Social Links -->
           <div style="margin-bottom:16px">
             <div style="font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--gray-600);margin-bottom:12px">Social Media Links</div>
             <div class="form-grid form-grid-3">
@@ -216,19 +192,15 @@
             </div>
           </div>
 
-          <!-- Catalogue -->
           <div style="background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(78,124,42,0.05));border:2px dashed var(--gold);border-radius:12px;padding:20px;margin-bottom:20px">
             <div style="font-size:13px;font-weight:600;color:#8a6a1a;margin-bottom:10px">📁 Product Catalogue Link</div>
             <div class="form-group" style="margin-bottom:0">
               <label>Paste Catalogue Link (Google Drive / OneDrive / PDF URL)</label>
               <input type="url" id="empCatalogueLink" placeholder="https://drive.google.com/file/d/...">
             </div>
-            <p style="font-size:12px;color:var(--gray-600);margin-top:8px">
-              💡 Tip: Paste a shareable Google Drive, OneDrive, or direct PDF URL. The "View Catalogue" button appears on the card.
-            </p>
+            <p style="font-size:12px;color:var(--gray-600);margin-top:8px">💡 Tip: Paste a shareable Google Drive, OneDrive, or direct PDF URL. The "View Catalogue" button appears on the card.</p>
           </div>
 
-          <!-- Logo Override -->
           <div style="margin-bottom:8px">
             <div style="font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--gray-600);margin-bottom:8px">Company Logo Override (optional)</div>
             <div class="form-group">
@@ -240,7 +212,6 @@
 
         </form>
       </div>
-
       <div class="modal-footer">
         <button class="btn btn-secondary" onclick="closeModal('empModal')">Cancel</button>
         <button class="btn btn-maroon" id="saveEmpBtn" onclick="saveEmployee()">💾 Save Employee Card</button>
@@ -273,7 +244,6 @@
 
   <div class="toast" id="toast"></div>
 
-  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
