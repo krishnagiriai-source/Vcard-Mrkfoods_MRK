@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🔧 MRK Foods — Image Debug Tool</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:      #0f1117;
+      --panel:   #1a1f2e;
+      --border:  #2a3045;
+      --green:   #00e676;
+      --red:     #ff5252;
+      --yellow:  #ffca28;
+      --blue:    #448aff;
+      --gold:    #c9a84c;
+      --text:    #e8eaf0;
+      --sub:     #8892a4;
+      --code-bg: #0d1117;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg); color: var(--text);
+      min-height: 100vh; padding: 24px 16px 60px;
+    }
+
+    .page { max-width: 860px; margin: 0 auto; }
+
+    /* Header */
+    .header {
+      text-align: center; margin-bottom: 32px;
+      padding: 32px 24px;
+      background: linear-gradient(135deg, rgba(201,168,76,0.08), rgba(68,138,255,0.06));
+      border: 1px solid rgba(201,168,76,0.25);
+      border-radius: 20px;
+    }
+    .header h1 { font-size: 24px; font-weight: 700; color: var(--gold); margin-bottom: 8px; }
+    .header p  { font-size: 14px; color: var(--sub); }
+
+    /* Sections */
+    .section {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 16px; margin-bottom: 20px; overflow: hidden;
+    }
+    .sec-head {
+      padding: 16px 22px; background: rgba(255,255,255,0.03);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .sec-icon { font-size: 20px; }
+    .sec-title { font-size: 15px; font-weight: 700; }
+    .sec-body  { padding: 22px; }
+
+    /* Status badges */
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 12px; border-radius: 20px;
+      font-size: 12px; font-weight: 600;
+    }
+    .badge-green  { background: rgba(0,230,118,0.12);  color: var(--green);  border: 1px solid rgba(0,230,118,0.3); }
+    .badge-red    { background: rgba(255,82,82,0.12);   color: var(--red);    border: 1px solid rgba(255,82,82,0.3); }
+    .badge-yellow { background: rgba(255,202,40,0.12);  color: var(--yellow); border: 1px solid rgba(255,202,40,0.3); }
+    .badge-blue   { background: rgba(68,138,255,0.12);  color: var(--blue);   border: 1px solid rgba(68,138,255,0.3); }
+
+    /* Code blocks */
+    .code-block {
+      background: var(--code-bg); border: 1px solid var(--border);
+      border-radius: 10px; padding: 16px; margin: 12px 0;
+      font-family: 'JetBrains Mono', monospace; font-size: 12.5px;
+      line-height: 1.6; color: #c9d1d9; overflow-x: auto;
+      white-space: pre-wrap; word-break: break-all;
+    }
+    .code-block .c-green  { color: #56d364; }
+    .code-block .c-yellow { color: #e3b341; }
+    .code-block .c-blue   { color: #79c0ff; }
+    .code-block .c-red    { color: #ff7b72; }
+    .code-block .c-gray   { color: #8b949e; }
+
+    /* Result rows */
+    .result-row {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .result-row:last-child { border-bottom: none; }
+    .result-label { min-width: 180px; font-size: 13px; color: var(--sub); flex-shrink: 0; }
+    .result-value { font-size: 13px; flex: 1; word-break: break-all; }
+
+    /* Inputs */
+    .inp-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+    input[type="text"], input[type="file"], select {
+      background: var(--code-bg); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text);
+      font-family: 'Poppins', sans-serif; font-size: 13px;
+      padding: 10px 14px; outline: none;
+      transition: border-color 0.2s;
+    }
+    input[type="text"] { flex: 1; min-width: 200px; }
+    input[type="text"]:focus, input[type="file"]:focus {
+      border-color: rgba(201,168,76,0.5);
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 10px 20px; border-radius: 10px; border: none;
+      font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; white-space: nowrap;
+    }
+    .btn-gold  { background: linear-gradient(135deg, #c9a84c, #8a6220); color: white; }
+    .btn-blue  { background: linear-gradient(135deg, #448aff, #1565c0); color: white; }
+    .btn-green { background: linear-gradient(135deg, #00e676, #00897b); color: white; }
+    .btn-red   { background: linear-gradient(135deg, #ff5252, #b71c1c); color: white; }
+    .btn:hover { opacity: 0.88; transform: translateY(-1px); }
+    .btn:active { transform: scale(0.96); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    /* Log output */
+    #logOutput {
+      background: var(--code-bg); border: 1px solid var(--border);
+      border-radius: 10px; padding: 16px; margin-top: 12px;
+      font-family: 'JetBrains Mono', monospace; font-size: 12px;
+      line-height: 1.8; max-height: 320px; overflow-y: auto;
+      min-height: 80px;
+    }
+    .log-ok   { color: var(--green); }
+    .log-err  { color: var(--red); }
+    .log-warn { color: var(--yellow); }
+    .log-info { color: var(--blue); }
+    .log-dim  { color: var(--sub); }
+
+    /* Photo preview */
+    .photo-compare {
+      display: flex; gap: 20px; flex-wrap: wrap; margin-top: 16px;
+    }
+    .photo-box {
+      flex: 1; min-width: 140px; max-width: 180px;
+      text-align: center;
+    }
+    .photo-circle {
+      width: 140px; height: 140px; border-radius: 50%;
+      object-fit: cover; object-position: top center;
+      border: 3px solid var(--gold);
+      box-shadow: 0 0 0 4px rgba(201,168,76,0.15);
+      background: #300008;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 8px;
+      font-size: 40px; font-weight: 800; color: var(--gold);
+      overflow: hidden;
+    }
+    .photo-circle img {
+      width: 100%; height: 100%;
+      border-radius: 50%; object-fit: cover; object-position: top center;
+    }
+    .photo-box-label { font-size: 11px; color: var(--sub); }
+
+    /* Progress bar */
+    .progress-wrap { background: var(--border); border-radius: 4px; height: 6px; margin-top: 10px; overflow: hidden; }
+    .progress-bar  { background: linear-gradient(90deg, var(--gold), #e8c96a); height: 100%; width: 0%; transition: width 0.3s; border-radius: 4px; }
+
+    /* Steps list */
+    .steps { list-style: none; counter-reset: step; }
+    .steps li {
+      counter-increment: step;
+      position: relative; padding: 12px 12px 12px 52px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      font-size: 13.5px; line-height: 1.5;
+    }
+    .steps li:last-child { border-bottom: none; }
+    .steps li::before {
+      content: counter(step);
+      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+      width: 28px; height: 28px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold), #8a6220);
+      color: white; font-size: 12px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* Divider */
+    hr { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+    /* Grid */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media(max-width:600px){ .two-col { grid-template-columns: 1fr; } }
+
+    /* Alert box */
+    .alert {
+      padding: 14px 18px; border-radius: 12px;
+      font-size: 13px; line-height: 1.5; margin-bottom: 14px;
+    }
+    .alert-yellow { background: rgba(255,202,40,0.08); border: 1px solid rgba(255,202,40,0.3); color: #ffe082; }
+    .alert-red    { background: rgba(255,82,82,0.08);  border: 1px solid rgba(255,82,82,0.3);  color: #ff8a80; }
+    .alert-green  { background: rgba(0,230,118,0.08);  border: 1px solid rgba(0,230,118,0.3);  color: #69f0ae; }
+    .alert-blue   { background: rgba(68,138,255,0.08); border: 1px solid rgba(68,138,255,0.3); color: #82b1ff; }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <h1>🔧 MRK Foods — Image Debug Tool</h1>
+    <p>Diagnose exactly why employee photos aren't showing on the digital card</p>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       SECTION 1: SYSTEM DIAGNOSIS
+  ══════════════════════════════════════ -->
+  <div class="section">
+    <div class="sec-head">
+      <span class="sec-icon">🩺</span>
+      <span class="sec-title">Step 1 — Run System Diagnosis</span>
+    </div>
+    <div class="sec-body">
+      <p style="font-size:13px;color:var(--sub);margin-bottom:14px">
+        Checks Firebase connection, Cloudinary config, and reads the employee's photoURL from Firestore.
+      </p>
+      <div class="inp-row">
+        <input type="text" id="diagEmpId" placeholder="Paste Employee Firestore ID here (e.g. nqeotLTwrgkLdNrIVew1)">
+        <button class="btn btn-gold" onclick="runDiagnosis()">▶ Run Diagnosis</button>
+      </div>
+      <div id="diagResult" style="margin-top:16px"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       SECTION 2: TEST CLOUDINARY UPLOAD
+  ══════════════════════════════════════ -->
+  <div class="section">
+    <div class="sec-head">
+      <span class="sec-icon">☁️</span>
+      <span class="sec-title">Step 2 — Test Cloudinary Upload</span>
+    </div>
+    <div class="sec-body">
+      <div class="alert alert-yellow">
+        ⚠️ Upload a test photo here. If it succeeds and shows the URL, your Cloudinary is working.
+        If it fails, that's why photos aren't saving to Firestore.
+      </div>
+
+      <div class="two-col">
+        <div>
+          <div style="font-size:12px;color:var(--sub);margin-bottom:8px;font-weight:600;letter-spacing:1px;text-transform:uppercase">Cloud Name</div>
+          <input type="text" id="testCloudName" placeholder="e.g. mrkfoods" style="width:100%">
+        </div>
+        <div>
+          <div style="font-size:12px;color:var(--sub);margin-bottom:8px;font-weight:600;letter-spacing:1px;text-transform:uppercase">Upload Preset (unsigned)</div>
+          <input type="text" id="testPreset" placeholder="e.g. mrk_unsigned" style="width:100%">
+        </div>
+      </div>
+
+      <div style="margin-top:14px">
+        <div style="font-size:12px;color:var(--sub);margin-bottom:8px;font-weight:600;letter-spacing:1px;text-transform:uppercase">Select Test Image</div>
+        <input type="file" id="testPhotoFile" accept="image/*">
+      </div>
+
+      <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-blue" onclick="testCloudinaryUpload()">☁️ Test Upload to Cloudinary</button>
+        <button class="btn btn-green" id="btnSavePhoto" onclick="savePhotoToFirestore()" disabled>💾 Save URL to Firestore</button>
+      </div>
+
+      <div class="progress-wrap" style="margin-top:12px"><div class="progress-bar" id="uploadProgress"></div></div>
+
+      <div id="uploadResult" style="margin-top:16px"></div>
+
+      <!-- Photo preview -->
+      <div class="photo-compare" id="photoCompare" style="display:none">
+        <div class="photo-box">
+          <div class="photo-circle" id="photoCircleInit">KG</div>
+          <div class="photo-box-label">Before (initials)</div>
+        </div>
+        <div class="photo-box">
+          <div class="photo-circle" id="photoCirclePhoto">
+            <img id="photoPreviewImg" src="" alt="Uploaded photo">
+          </div>
+          <div class="photo-box-label">After (your photo)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       SECTION 3: CHECK EMPLOYEE PHOTO URL
+  ══════════════════════════════════════ -->
+  <div class="section">
+    <div class="sec-head">
+      <span class="sec-icon">🔍</span>
+      <span class="sec-title">Step 3 — Check & Test a Photo URL Directly</span>
+    </div>
+    <div class="sec-body">
+      <p style="font-size:13px;color:var(--sub);margin-bottom:14px">
+        Paste any image URL (from Firestore or Cloudinary) to test if it loads correctly.
+      </p>
+      <div class="inp-row">
+        <input type="text" id="testImgUrl" placeholder="https://res.cloudinary.com/mrkfoods/image/upload/v.../photo.jpg">
+        <button class="btn btn-gold" onclick="testImageUrl()">🖼 Test URL</button>
+      </div>
+      <div id="imgUrlResult" style="margin-top:14px"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       SECTION 4: FIX — UPDATE EMPLOYEE PHOTO
+  ══════════════════════════════════════ -->
+  <div class="section">
+    <div class="sec-head">
+      <span class="sec-icon">🛠️</span>
+      <span class="sec-title">Step 4 — One-Click Fix: Upload Photo + Save to Firestore</span>
+    </div>
+    <div class="sec-body">
+      <div class="alert alert-blue">
+        This directly uploads the photo to Cloudinary and writes the URL to your Firestore employee document.
+        Use this to fix the photo without going through the dashboard.
+      </div>
+      <div class="inp-row">
+        <input type="text" id="fixEmpId" placeholder="Employee Firestore ID (e.g. nqeotLTwrgkLdNrIVew1)">
+      </div>
+      <div style="margin-top:12px">
+        <input type="file" id="fixPhotoFile" accept="image/*">
+      </div>
+      <div style="margin-top:14px;display:flex;gap:10px">
+        <button class="btn btn-green" onclick="oneClickFix()">⚡ Upload Photo + Fix Card Now</button>
+      </div>
+      <div class="progress-wrap" style="margin-top:12px"><div class="progress-bar" id="fixProgress"></div></div>
+      <div id="fixResult" style="margin-top:16px"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       SECTION 5: TROUBLESHOOTING GUIDE
+  ══════════════════════════════════════ -->
+  <div class="section">
+    <div class="sec-head">
+      <span class="sec-icon">📋</span>
+      <span class="sec-title">Complete Troubleshooting Checklist</span>
+    </div>
+    <div class="sec-body">
+
+      <div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:10px">
+        For Your System (Cloudinary + Firebase)
+      </div>
+      <ol class="steps">
+        <li>Open <strong>Firestore Console</strong> → employees collection → click your employee → check if <code>photoURL</code> field exists and has a full <code>https://res.cloudinary.com/...</code> URL</li>
+        <li>If <code>photoURL</code> is empty/missing → Cloudinary upload is failing. Run Section 2 test above.</li>
+        <li>Go to <strong>cloudinary.com</strong> → Settings → Upload Presets → confirm your preset is set to <strong>Unsigned</strong></li>
+        <li>Check your <strong>Cloud Name</strong> exactly: cloudinary.com → Dashboard → top-left shows "Cloud name: xxxxxx"</li>
+        <li>Open your card URL → Press <strong>F12</strong> → Console tab → look for <code>✅ Showing photo:</code> or <code>ℹ️ No photoURL</code></li>
+        <li>If <code>photoURL</code> exists in Firestore but image is blank → press F12 → Network tab → filter "Img" → look for the Cloudinary URL → check its status code</li>
+        <li>If status is <strong>200</strong> but image invisible → CSS issue. Paste URL in new tab to confirm it loads.</li>
+        <li>If <strong>403</strong> → Cloudinary folder/preset permissions issue</li>
+        <li>If <strong>404</strong> → wrong URL stored in Firestore</li>
+        <li>After any fix: hard-refresh the card page with <strong>Ctrl+Shift+R</strong></li>
+      </ol>
+
+      <hr>
+      <div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:10px;margin-top:4px">
+        For General Static Sites on Vercel (HTML/CSS/JS — no framework)
+      </div>
+
+      <div class="two-col">
+        <div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--sub);margin-bottom:10px">❌ Wrong</div>
+          <div class="code-block"><span class="c-red">&lt;img src="photo.jpg"&gt;         ← if img is in /images/
+&lt;img src="/images/Photo.JPG"&gt; ← wrong case
+&lt;img src="./img/photo.jpg"&gt;   ← if deployed differently
+</span></div>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--sub);margin-bottom:10px">✅ Correct</div>
+          <div class="code-block"><span class="c-green">&lt;img src="/images/photo.jpg"&gt;  ← absolute from root
+&lt;img src="images/photo.jpg"&gt;  ← relative, same dir
+&lt;img src="./images/photo.jpg"&gt; ← explicit relative
+</span></div>
+        </div>
+      </div>
+
+      <div style="font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--sub);margin:14px 0 8px">Correct Folder Structures</div>
+      <div class="code-block"><span class="c-yellow">project/              </span><span class="c-gray">← root</span>
+├── <span class="c-blue">index.html</span>
+├── <span class="c-blue">card.html</span>
+├── <span class="c-blue">dashboard.html</span>
+├── <span class="c-green">images/</span>
+│   └── <span class="c-green">photo.jpg</span>       <span class="c-gray">← src="images/photo.jpg" ✅</span>
+├── <span class="c-green">assets/</span>
+│   └── <span class="c-green">photo.jpg</span>       <span class="c-gray">← src="assets/photo.jpg" ✅</span>
+└── <span class="c-green">photo.jpg</span>           <span class="c-gray">← src="photo.jpg" ✅ (same folder)</span></div>
+
+      <div style="font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--sub);margin:14px 0 8px">Clear Vercel Cache + Redeploy</div>
+      <ol class="steps">
+        <li>Go to <strong>vercel.com</strong> → your project → Settings → General → scroll to "Build & Development Settings"</li>
+        <li>Click <strong>"Redeploy"</strong> on the latest deployment with "without cache" option checked</li>
+        <li>Or force GitHub push: make any tiny change (add a space to README) → commit → push → Vercel auto-redeploys fresh</li>
+        <li>Hard refresh browser: <strong>Ctrl+Shift+R</strong> (Chrome/Edge) or <strong>Cmd+Shift+R</strong> (Mac)</li>
+      </ol>
+
+      <div style="font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--sub);margin:14px 0 8px">Confirm Image URL Works in Browser</div>
+      <div class="code-block"><span class="c-gray">1. Copy the image URL completely
+2. Open a new browser tab
+3. Paste the URL and press Enter
+4. If image shows → URL is correct, issue is in HTML/CSS
+5. If 404 shows → wrong path or file not uploaded
+6. If 403 shows → permissions issue
+7. If blank white → MIME type issue</span></div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       SECTION 6: WORKING CODE SNIPPET
+  ══════════════════════════════════════ -->
+  <div class="section">
+    <div class="sec-head">
+      <span class="sec-icon">💻</span>
+      <span class="sec-title">Final Working Image Code — Copy-Paste Ready</span>
+    </div>
+    <div class="sec-body">
+
+      <div style="font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">HTML — With Fallback & Responsive CSS</div>
+      <div class="code-block"><span class="c-gray">&lt;!-- ✅ Image with circular frame, fallback, responsive --&gt;</span>
+<span class="c-blue">&lt;div</span> <span class="c-green">class</span>=<span class="c-yellow">"profile-ring-wrap"</span><span class="c-blue">&gt;</span>
+
+  <span class="c-gray">&lt;!-- Show when photo exists --&gt;</span>
+  <span class="c-blue">&lt;img</span>
+    <span class="c-green">id</span>=<span class="c-yellow">"cardPhoto"</span>
+    <span class="c-green">class</span>=<span class="c-yellow">"profile-photo"</span>
+    <span class="c-green">src</span>=<span class="c-yellow">""</span>
+    <span class="c-green">alt</span>=<span class="c-yellow">"Employee Photo"</span>
+    <span class="c-green">style</span>=<span class="c-yellow">"display:none"</span>
+    <span class="c-green">onerror</span>=<span class="c-yellow">"this.style.display='none';
+             document.getElementById('cardInit').style.display='flex';"</span>
+  <span class="c-blue">&gt;</span>
+
+  <span class="c-gray">&lt;!-- Show when no photo (fallback initials) --&gt;</span>
+  <span class="c-blue">&lt;div</span> <span class="c-green">id</span>=<span class="c-yellow">"cardInit"</span> <span class="c-green">class</span>=<span class="c-yellow">"profile-initials"</span><span class="c-blue">&gt;</span>KG<span class="c-blue">&lt;/div&gt;</span>
+
+<span class="c-blue">&lt;/div&gt;</span>
+
+<span class="c-gray">&lt;!-- CSS --&gt;</span>
+<span class="c-blue">&lt;style&gt;</span>
+<span class="c-green">.profile-ring-wrap</span> {
+  position: relative;
+  width: 160px; height: 160px;
+  margin: 0 auto 22px;
+  flex-shrink: 0;
+}
+
+<span class="c-gray">/* Spinning gold ring */</span>
+<span class="c-green">.profile-ring-wrap::before</span> {
+  content: '';
+  position: absolute; inset: -4px; border-radius: 50%;
+  background: conic-gradient(from 0deg, #c9a84c, #8b3a22 30%, #1a4f7a 60%, #c9a84c);
+  animation: spinRing 6s linear infinite;
+  z-index: 0;
+}
+@keyframes spinRing { to { transform: rotate(360deg); } }
+
+<span class="c-gray">/* Gap between ring and image */</span>
+<span class="c-green">.profile-ring-wrap::after</span> {
+  content: '';
+  position: absolute; inset: 1px; border-radius: 50%;
+  background: #0d1626; z-index: 1;
+}
+
+<span class="c-gray">/* ✅ KEY: photo fills circle perfectly */</span>
+<span class="c-green">.profile-photo</span> {
+  position: absolute;
+  inset: 6px;
+  width: calc(100% - 12px);
+  height: calc(100% - 12px);
+  border-radius: 50%;        <span class="c-gray">/* perfect circle */</span>
+  object-fit: cover;         <span class="c-gray">/* fill without squishing */</span>
+  object-position: top center; <span class="c-gray">/* show face not feet */</span>
+  z-index: 2;
+  display: none;             <span class="c-gray">/* JS makes visible */</span>
+}
+
+<span class="c-gray">/* Initials fallback */</span>
+<span class="c-green">.profile-initials</span> {
+  position: absolute; inset: 6px;
+  width: calc(100% - 12px); height: calc(100% - 12px);
+  border-radius: 50%; z-index: 2;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #6b0f22, #300008);
+  font-size: 44px; font-weight: 800; color: #c9a84c;
+}
+<span class="c-blue">&lt;/style&gt;</span>
+
+<span class="c-gray">&lt;!-- JS — show photo if URL exists, else show initials --&gt;</span>
+<span class="c-blue">&lt;script&gt;</span>
+<span class="c-red">function</span> <span class="c-green">showEmployeePhoto</span>(photoURL, name) {
+  const photoEl  = document.getElementById(<span class="c-yellow">'cardPhoto'</span>);
+  const initialsEl = document.getElementById(<span class="c-yellow">'cardInit'</span>);
+
+  <span class="c-red">if</span> (photoURL && photoURL.trim() !== <span class="c-yellow">''</span>) {
+    photoEl.src           = photoURL;
+    photoEl.style.display = <span class="c-yellow">'block'</span>;
+    initialsEl.style.display = <span class="c-yellow">'none'</span>;
+  } <span class="c-red">else</span> {
+    photoEl.style.display = <span class="c-yellow">'none'</span>;
+    initialsEl.textContent  = (name || <span class="c-yellow">'?'</span>)
+      .split(<span class="c-yellow">' '</span>).map(n => n[0]).join(<span class="c-yellow">''</span>)
+      .slice(0, 2).toUpperCase();
+    initialsEl.style.display = <span class="c-yellow">'flex'</span>;
+  }
+}
+<span class="c-blue">&lt;/script&gt;</span></div>
+
+    </div>
+  </div>
+
+  <!-- LOG CONSOLE -->
+  <div class="section">
+    <div class="sec-head">
+      <span class="sec-icon">🖥️</span>
+      <span class="sec-title">Debug Log Console</span>
+    </div>
+    <div class="sec-body" style="padding-bottom:14px">
+      <div style="display:flex;gap:10px;margin-bottom:12px">
+        <button class="btn btn-red" onclick="clearLog()" style="padding:8px 16px;font-size:12px">🗑 Clear Log</button>
+        <span style="font-size:12px;color:var(--sub);align-self:center">All operations log here in real-time</span>
+      </div>
+      <div id="logOutput"><span class="log-dim">Waiting for actions... Run a diagnosis above to start.</span></div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+
+<script>
+// ════════════════════════════════════════
+// CLOUDINARY CONFIG — reads from input fields
+// ════════════════════════════════════════
+function getCdnConfig() {
+  const cloudName = (document.getElementById('testCloudName')?.value || '').trim();
+  const preset    = (document.getElementById('testPreset')?.value    || '').trim();
+  return { cloudName, preset };
+}
+
+// ════════════════════════════════════════
+// LOG HELPER
+// ════════════════════════════════════════
+function log(msg, type='info') {
+  const el = document.getElementById('logOutput');
+  const cls = {ok:'log-ok', err:'log-err', warn:'log-warn', info:'log-info', dim:'log-dim'}[type] || 'log-info';
+  const time = new Date().toLocaleTimeString();
+  el.innerHTML += `<div class="${cls}">[${time}] ${msg}</div>`;
+  el.scrollTop = el.scrollHeight;
+}
+function clearLog() {
+  document.getElementById('logOutput').innerHTML = '<span class="log-dim">Log cleared.</span>';
+}
+
+// ════════════════════════════════════════
+// SECTION 1: DIAGNOSIS
+// ════════════════════════════════════════
+async function runDiagnosis() {
+  const empId = document.getElementById('diagEmpId').value.trim();
+  const out   = document.getElementById('diagResult');
+
+  if (!empId) { out.innerHTML = '<div class="alert alert-red">⚠️ Please enter an Employee Firestore ID</div>'; return; }
+
+  out.innerHTML = '<div class="alert alert-blue">⏳ Running diagnosis…</div>';
+  log('Starting diagnosis for employee: ' + empId);
+
+  let html = '<div>';
+
+  // 1. Firebase connection
+  try {
+    log('Testing Firestore connection…');
+    const snap = await db.collection('employees').doc(empId).get();
+
+    if (!snap.exists) {
+      html += badge('red', '❌ Employee ID not found in Firestore — check your ID');
+      out.innerHTML = html + '</div>';
+      log('Employee ID not found: ' + empId, 'err');
+      return;
+    }
+
+    const emp = snap.data();
+    log('✅ Employee found: ' + emp.name, 'ok');
+    html += badge('green', '✅ Firestore connection OK');
+    html += badge('green', '✅ Employee found: ' + (emp.name || 'unknown'));
+
+    // 2. photoURL check
+    if (!emp.photoURL || emp.photoURL.trim() === '') {
+      html += badge('red', '❌ photoURL is EMPTY — This is why photo is not showing!');
+      html += '<div class="alert alert-red" style="margin-top:12px"><strong>Root cause found:</strong> The <code>photoURL</code> field in Firestore is empty or missing. The Cloudinary upload is not working. Use Section 2 to test and fix the upload.</div>';
+      log('❌ photoURL is EMPTY in Firestore', 'err');
+
+      // Pre-fill fix section
+      document.getElementById('fixEmpId').value = empId;
+    } else {
+      html += badge('green', '✅ photoURL exists in Firestore');
+      html += '<div class="code-block" style="margin:10px 0;word-break:break-all">' + emp.photoURL + '</div>';
+      log('photoURL: ' + emp.photoURL, 'ok');
+
+      // Auto-test the URL
+      document.getElementById('testImgUrl').value = emp.photoURL;
+      testImageUrl(emp.photoURL);
+    }
+
+    // 3. Show all fields
+    html += '<hr><div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--sub);margin:12px 0 8px">All Firestore Fields</div>';
+    html += '<div>';
+    const fields = ['name','designation','mobile','email','address','photoURL','whatsapp','facebook','linkedin','instagram','catalogueLink','googleLocationLink'];
+    fields.forEach(f => {
+      const val = emp[f] || '';
+      const ok  = val.trim() !== '';
+      html += `<div class="result-row">
+        <div class="result-label">${f}</div>
+        <div class="result-value">${ok ? `<span style="color:var(--text)">${escH(val)}</span>` : '<span style="color:var(--sub)">—</span>'}</div>
+      </div>`;
+    });
+    html += '</div>';
+
+  } catch(e) {
+    html += badge('red', '❌ Firestore error: ' + e.message);
+    log('Firestore error: ' + e.message, 'err');
+  }
+
+  html += '</div>';
+  out.innerHTML = html;
+}
+
+// ════════════════════════════════════════
+// SECTION 2: TEST CLOUDINARY UPLOAD
+// ════════════════════════════════════════
+let lastUploadedUrl = '';
+let lastTestEmpId   = '';
+
+async function testCloudinaryUpload() {
+  const { cloudName, preset } = getCdnConfig();
+  const file = document.getElementById('testPhotoFile').files[0];
+  const out  = document.getElementById('uploadResult');
+  const prog = document.getElementById('uploadProgress');
+  const btn  = document.getElementById('btnSavePhoto');
+
+  if (!cloudName || !preset) {
+    out.innerHTML = '<div class="alert alert-red">⚠️ Enter Cloud Name and Upload Preset first</div>'; return;
+  }
+  if (!file) {
+    out.innerHTML = '<div class="alert alert-red">⚠️ Select an image file first</div>'; return;
+  }
+
+  log(`Testing Cloudinary upload — cloud: ${cloudName}, preset: ${preset}`);
+  out.innerHTML = '<div class="alert alert-blue">⏳ Uploading to Cloudinary…</div>';
+  prog.style.width = '20%';
+
+  try {
+    const formData = new FormData();
+    formData.append('file',          file);
+    formData.append('upload_preset', preset);
+    formData.append('folder',        'mrk-debug-test');
+
+    prog.style.width = '50%';
+
+    const res  = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, { method:'POST', body:formData });
+    const data = await res.json();
+
+    prog.style.width = '90%';
+
+    if (!res.ok || data.error) {
+      const msg = data.error?.message || `HTTP ${res.status}`;
+      out.innerHTML = `<div class="alert alert-red">❌ Cloudinary upload FAILED: <strong>${escH(msg)}</strong><br><br>
+        <strong>Common fixes:</strong><br>
+        • Check Cloud Name is correct (cloudinary.com → Dashboard → top-left)<br>
+        • Check Upload Preset exists and is set to <strong>Unsigned</strong><br>
+        • Settings → Upload → Upload Presets → check "Signing Mode = Unsigned"
+      </div>`;
+      log('❌ Cloudinary FAILED: ' + msg, 'err');
+      prog.style.width = '0%';
+      return;
+    }
+
+    prog.style.width = '100%';
+    lastUploadedUrl = data.secure_url;
+
+    out.innerHTML = `
+      <div class="alert alert-green">✅ Cloudinary upload SUCCESSFUL!</div>
+      <div style="margin-top:12px">
+        <div style="font-size:11px;color:var(--sub);margin-bottom:6px;letter-spacing:1px;text-transform:uppercase">Cloudinary URL (save this)</div>
+        <div class="code-block" style="word-break:break-all;font-size:12px">${data.secure_url}</div>
+      </div>
+      <div class="result-row">
+        <div class="result-label">Public ID</div>
+        <div class="result-value" style="font-size:12px">${data.public_id}</div>
+      </div>
+      <div class="result-row">
+        <div class="result-label">Dimensions</div>
+        <div class="result-value">${data.width} × ${data.height}px</div>
+      </div>
+      <div class="result-row">
+        <div class="result-label">Format</div>
+        <div class="result-value">${data.format} • ${Math.round(data.bytes/1024)}KB</div>
+      </div>`;
+
+    // Show photo preview
+    document.getElementById('photoPreviewImg').src = data.secure_url;
+    document.getElementById('photoCompare').style.display = 'flex';
+    btn.disabled = false;
+
+    log('✅ Cloudinary upload OK: ' + data.secure_url, 'ok');
+    log('👆 Now click "Save URL to Firestore" to fix the employee card', 'warn');
+
+  } catch(e) {
+    out.innerHTML = `<div class="alert alert-red">❌ Network error: ${escH(e.message)}</div>`;
+    log('Network error: ' + e.message, 'err');
+    prog.style.width = '0%';
+  }
+}
+
+async function savePhotoToFirestore() {
+  const empId = document.getElementById('diagEmpId').value.trim();
+  if (!empId || !lastUploadedUrl) return;
+
+  try {
+    await db.collection('employees').doc(empId).update({ photoURL: lastUploadedUrl, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    document.getElementById('uploadResult').innerHTML += '<div class="alert alert-green" style="margin-top:10px">✅ photoURL saved to Firestore! Refresh your card to see the photo.</div>';
+    log('✅ photoURL saved to Firestore for employee: ' + empId, 'ok');
+  } catch(e) {
+    document.getElementById('uploadResult').innerHTML += `<div class="alert alert-red" style="margin-top:10px">❌ Firestore save failed: ${escH(e.message)}</div>`;
+    log('❌ Firestore save error: ' + e.message, 'err');
+  }
+}
+
+// ════════════════════════════════════════
+// SECTION 3: TEST IMAGE URL
+// ════════════════════════════════════════
+function testImageUrl(url) {
+  const testUrl = url || document.getElementById('testImgUrl').value.trim();
+  const out     = document.getElementById('imgUrlResult');
+  if (!testUrl) { out.innerHTML = '<div class="alert alert-red">⚠️ Enter a URL first</div>'; return; }
+
+  log('Testing image URL: ' + testUrl.substring(0,60) + '…');
+  out.innerHTML = '<div class="alert alert-blue">⏳ Testing URL…</div>';
+
+  const img = new Image();
+  img.onload = () => {
+    out.innerHTML = `
+      <div class="alert alert-green">✅ Image URL loads correctly! (${img.naturalWidth}×${img.naturalHeight}px)</div>
+      <div style="margin-top:12px;text-align:center">
+        <img src="${escH(testUrl)}" style="max-width:160px;max-height:160px;border-radius:50%;object-fit:cover;border:3px solid var(--gold)">
+        <div style="font-size:11px;color:var(--sub);margin-top:8px">Image renders as circular avatar ✅</div>
+      </div>`;
+    log('✅ Image URL loads OK — ' + img.naturalWidth + '×' + img.naturalHeight + 'px', 'ok');
+  };
+  img.onerror = () => {
+    out.innerHTML = `<div class="alert alert-red">
+      ❌ Image URL failed to load.<br><br>
+      <strong>This means:</strong> The URL stored in Firestore is broken or inaccessible.<br>
+      Re-upload the photo using Section 2 or Section 4 above.
+    </div>`;
+    log('❌ Image URL failed to load: ' + testUrl, 'err');
+  };
+  img.src = testUrl;
+}
+
+// ════════════════════════════════════════
+// SECTION 4: ONE-CLICK FIX
+// ════════════════════════════════════════
+async function oneClickFix() {
+  const empId  = document.getElementById('fixEmpId').value.trim();
+  const file   = document.getElementById('fixPhotoFile').files[0];
+  const out    = document.getElementById('fixResult');
+  const prog   = document.getElementById('fixProgress');
+
+  const cnInput = document.getElementById('testCloudName').value.trim();
+  const prInput = document.getElementById('testPreset').value.trim();
+
+  if (!empId) { out.innerHTML = '<div class="alert alert-red">⚠️ Enter Employee Firestore ID</div>'; return; }
+  if (!file)  { out.innerHTML = '<div class="alert alert-red">⚠️ Select a photo file</div>'; return; }
+  if (!cnInput || !prInput) { out.innerHTML = '<div class="alert alert-red">⚠️ Fill in Cloud Name and Upload Preset in Section 2 first</div>'; return; }
+
+  log('⚡ One-click fix starting for employee: ' + empId);
+  out.innerHTML = '<div class="alert alert-blue">⏳ Step 1/3: Uploading photo to Cloudinary…</div>';
+  prog.style.width = '10%';
+
+  try {
+    // Step 1: Upload to Cloudinary
+    const formData = new FormData();
+    formData.append('file',          file);
+    formData.append('upload_preset', prInput);
+    formData.append('folder',        'mrk-employees/photos');
+
+    prog.style.width = '40%';
+    const res  = await fetch(`https://api.cloudinary.com/v1_1/${cnInput}/image/upload`, { method:'POST', body:formData });
+    const data = await res.json();
+
+    if (!res.ok || data.error) throw new Error(data.error?.message || `HTTP ${res.status}`);
+    const photoURL = data.secure_url;
+    prog.style.width = '65%';
+    log('✅ Step 1 OK — uploaded: ' + photoURL, 'ok');
+
+    // Step 2: Verify URL loads
+    await new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload  = resolve;
+      img.onerror = () => reject(new Error('Uploaded URL failed to load'));
+      img.src     = photoURL;
+    });
+    prog.style.width = '80%';
+    log('✅ Step 2 OK — URL verified', 'ok');
+
+    // Step 3: Save to Firestore
+    await db.collection('employees').doc(empId).update({
+      photoURL:  photoURL,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    prog.style.width = '100%';
+    log('✅ Step 3 OK — saved to Firestore', 'ok');
+
+    out.innerHTML = `
+      <div class="alert alert-green">
+        ✅ All 3 steps complete! Employee photo is now saved.<br><br>
+        <strong>Next:</strong> Open your card link and press <strong>Ctrl+Shift+R</strong> to hard-refresh.
+      </div>
+      <div style="margin-top:14px;text-align:center">
+        <img src="${escH(photoURL)}" style="width:140px;height:140px;border-radius:50%;object-fit:cover;object-position:top center;border:3px solid var(--gold);display:block;margin:0 auto 8px">
+        <div style="font-size:12px;color:var(--sub)">Your photo — now live on the card</div>
+      </div>
+      <div class="code-block" style="margin-top:12px;font-size:11px;word-break:break-all">${photoURL}</div>`;
+
+    log('🎉 Fix complete! Card will now show photo after refresh.', 'ok');
+
+  } catch(e) {
+    prog.style.width = '0%';
+    out.innerHTML = `<div class="alert alert-red">❌ Fix failed: ${escH(e.message)}</div>`;
+    log('❌ Fix failed: ' + e.message, 'err');
+  }
+}
+
+// ════════════════════════════════════════
+// UTILITIES
+// ════════════════════════════════════════
+function badge(type, text) {
+  const cls = { green:'badge-green', red:'badge-red', yellow:'badge-yellow', blue:'badge-blue' }[type];
+  return `<div class="badge ${cls}" style="margin-bottom:8px">${text}</div>`;
+}
+function escH(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>
