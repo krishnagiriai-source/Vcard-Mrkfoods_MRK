@@ -25,8 +25,6 @@ async function uploadToCloudinary(file, folder = 'mrk-employees') {
   formData.append('file',           file);
   formData.append('upload_preset',  CLOUDINARY_UPLOAD_PRESET);
   formData.append('folder',         folder);
-  // Auto-transform: max 800px wide, 75% quality, auto format
-  formData.append('transformation', JSON.stringify([{ width: 800, quality: 75, fetch_format: 'auto' }]));
 
   const res  = await fetch(CLOUDINARY_UPLOAD_URL, { method: 'POST', body: formData });
   const data = await res.json();
