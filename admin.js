@@ -329,35 +329,45 @@ async function deleteEmployee(id, name) {
 // QR MODAL
 // ============================================
 function showQR(id) {
-  const rows   = document.querySelectorAll('#empTableBody tr');
-  let empName  = id;
+  const rows  = document.querySelectorAll('#empTableBody tr');
+  let empName = id;
   rows.forEach(row => {
     if (row.innerHTML.includes(`editEmployee('${id}')`)) {
       empName = row.querySelector('.emp-name')?.textContent || id;
     }
   });
   const cardUrl = getCardUrl(id);
-  const qrUrl   = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(cardUrl)}&color=3d0009&bgcolor=ffffff`;
-  document.getElementById('qrEmpName').textContent    = empName;
-  document.getElementById('qrImage').src              = qrUrl;
-  document.getElementById('qrCardUrl').textContent    = cardUrl;
-  document.getElementById('qrCardUrlHidden').value    = cardUrl;
+  document.getElementById('qrEmpName').textContent  = empName;
+  document.getElementById('qrCardUrl').textContent  = cardUrl;
+  document.getElementById('qrCardUrlHidden').value  = cardUrl;
+
+  // Generate QR using local library — no external API, instant, reliable
+  const container = document.getElementById('qrImage');
+  container.innerHTML = '';
+  if (window.QRCode) {
+    new QRCode(container, {
+      text:         cardUrl,
+      width:        200,
+      height:       200,
+      colorDark:    '#3d0009',
+      colorLight:   '#ffffff',
+      correctLevel: QRCode.CorrectLevel.M
+    });
+  }
   openModal('qrModal');
 }
 
-async function downloadQR() {
-  const img = document.getElementById('qrImage');
-  try {
-    const resp = await fetch(img.src);
-    const blob = await resp.blob();
-    const url  = URL.createObjectURL(blob);
-    const a    = Object.assign(document.createElement('a'), {
-      href: url,
-      download: document.getElementById('qrEmpName').textContent.replace(/\s+/g,'_') + '_QR.png'
-    });
-    a.click(); URL.revokeObjectURL(url);
-    showToast('QR downloaded!', 'success');
-  } catch { showToast('Right-click the QR to save.', 'error'); }
+function downloadQR() {
+  const container = document.getElementById('qrImage');
+  const canvas    = container.querySelector('canvas');
+  if (!canvas) { showToast('Right-click QR image to save.', 'error'); return; }
+  const empName   = document.getElementById('qrEmpName').textContent.replace(/\s+/g, '_');
+  const a         = Object.assign(document.createElement('a'), {
+    href:     canvas.toDataURL('image/png'),
+    download: empName + '_QR.png'
+  });
+  a.click();
+  showToast('QR downloaded!', 'success');
 }
 
 function copyQRLink() { copyLink(document.getElementById('qrCardUrlHidden').value); }
