@@ -229,7 +229,7 @@
       <div class="modal-body">
         <div class="qr-display">
           <p style="font-weight:600;color:var(--maroon);margin-bottom:16px" id="qrEmpName"></p>
-          <img id="qrImage" src="" alt="QR Code" class="qr-code-img" style="width:200px;height:200px">
+          <div id="qrImage" style="width:200px;height:200px;display:flex;align-items:center;justify-content:center;margin:0 auto"></div>
           <p style="font-size:12px;color:var(--gray-600);margin:12px 0 8px">Scan to open card. No login required.</p>
           <div class="card-url" id="qrCardUrl"></div>
           <input type="hidden" id="qrCardUrlHidden">
@@ -249,6 +249,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
   <script src="firebase-config.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="admin.js"></script>
   <script>initDashboard();</script>
 </body>
