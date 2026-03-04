@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MRK Foods — Admin Dashboard</title>
+  <link rel="icon" type="image/jpeg" href="mrk_logo.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+  <!-- ═══════════════════════════════════════════════
+       ALL STYLES — Dashboard + Modal + Card Grid
+  ═══════════════════════════════════════════════ -->
+  <style>
+    /* ── CSS Variables ── */
+    :root {
+      --bg:         #f4f6fa;
+      --sidebar:    #0b1623;
+      --sidebar2:   #101f31;
+      --white:      #ffffff;
+      --gold:       #c9a84c;
+      --gold-lt:    #e8c86d;
+      --maroon:     #8b1a1a;
+      --maroon-lt:  #a52020;
+      --green:      #22c55e;
+      --green-dk:   #16a34a;
+      --text:       #1a2332;
+      --text-sub:   #5a6a80;
+      --border:     #e2e8f0;
+      --shadow-sm:  0 1px 4px rgba(0,0,0,0.07);
+      --shadow-md:  0 4px 16px rgba(0,0,0,0.10);
+      --shadow-lg:  0 12px 40px rgba(0,0,0,0.13);
+      --radius:     16px;
+      --gold-grad:  linear-gradient(135deg, #c9a84c, #e8c86d);
+      --maroon-grad:linear-gradient(135deg, #8b1a1a, #c0392b);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ════════════════════════════════════════
+       TOPBAR
+    ════════════════════════════════════════ */
+    .topbar {
+      position: sticky; top: 0; z-index: 200;
+      height: 64px;
+      background: var(--sidebar);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 28px;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.35);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .topbar-brand { display: flex; align-items: center; gap: 12px; }
+    .topbar-brand img {
+      height: 36px; width: 36px;
+      border-radius: 8px; object-fit: contain;
+      background: white; padding: 2px;
+    }
+    .topbar-brand-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem; font-weight: 700;
+      color: var(--gold-lt); letter-spacing: 0.02em;
+      line-height: 1.1;
+    }
+    .topbar-brand-sub {
+      font-size: 0.62rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: rgba(255,255,255,0.35);
+    }
+    .topbar-actions { display: flex; align-items: center; gap: 12px; }
+    .topbar-user {
+      font-size: 0.8rem; color: rgba(255,255,255,0.6);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .topbar-user .user-dot {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: linear-gradient(135deg, #8b1a1a, var(--gold));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem; font-weight: 700; color: white;
+    }
+
+    /* ════════════════════════════════════════
+       BUTTONS (global)
+    ════════════════════════════════════════ */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      border: none; border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 600; cursor: pointer;
+      transition: all 0.18s ease;
+      white-space: nowrap; text-decoration: none;
+    }
+    .btn:hover { transform: translateY(-1px); opacity: 0.9; }
+    .btn:active { transform: translateY(0); }
+    .btn-primary {
+      background: var(--sidebar); color: white;
+      padding: 12px 24px; font-size: 0.88rem;
+    }
+    .btn-maroon {
+      background: var(--maroon-grad); color: white;
+      padding: 10px 20px; font-size: 0.85rem;
+      box-shadow: 0 4px 14px rgba(139,26,26,0.35);
+    }
+    .btn-green {
+      background: linear-gradient(135deg,#16a34a,#22c55e); color: white;
+      padding: 7px 13px; font-size: 0.75rem;
+    }
+    .btn-secondary {
+      background: #f0f4fa; color: var(--text-sub);
+      border: 1.5px solid var(--border);
+      padding: 7px 13px; font-size: 0.75rem;
+    }
+    .btn-secondary:hover { background: #e4ecf7; color: var(--text); }
+    .btn-danger {
+      background: #fef2f2; color: #dc2626;
+      border: 1.5px solid #fecaca;
+      padding: 7px 13px; font-size: 0.75rem;
+    }
+    .btn-danger:hover { background: #fee2e2; }
+    .btn-sm { padding: 6px 11px; font-size: 0.72rem; border-radius: 8px; }
+
+    /* ════════════════════════════════════════
+       MAIN CONTAINER
+    ════════════════════════════════════════ */
+    .container {
+      max-width: 1200px; margin: 0 auto;
+      padding: 32px 28px 60px;
+    }
+
+    /* ── Page Header ── */
+    .page-header { margin-bottom: 24px; }
+    .page-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem; font-weight: 700; color: var(--text);
+      margin-bottom: 4px;
+    }
+    .page-subtitle { font-size: 0.88rem; color: var(--text-sub); }
+
+    /* ════════════════════════════════════════
+       SYNC BANNER
+    ════════════════════════════════════════ */
+    .sync-banner {
+      background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+      border: 1.5px solid #bbf7d0;
+      border-radius: var(--radius);
+      padding: 14px 20px;
+      display: flex; align-items: center;
+      justify-content: space-between; gap: 16px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    .sync-inner { display: flex; align-items: center; gap: 14px; }
+    .sync-icon {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: white; box-shadow: var(--shadow-sm);
+      display: flex; align-items: center; justify-content: center; font-size: 20px;
+      flex-shrink: 0;
+    }
+    .sync-title { font-size: 0.88rem; font-weight: 700; color: #15803d; margin-bottom: 2px; }
+    .sync-sub { font-size: 0.78rem; color: #16a34a; }
+    .live-badge {
+      background: var(--green); color: white;
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em;
+      padding: 5px 14px; border-radius: 20px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .live-dot {
+      width: 7px; height: 7px; border-radius: 50%; background: white;
+      animation: blink 1.4s infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    /* ════════════════════════════════════════
+       STATS
+    ════════════════════════════════════════ */
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr);
+      gap: 16px; margin-bottom: 28px;
+      max-width: 420px;
+    }
+    .stat-card {
+      background: var(--white); border-radius: var(--radius);
+      padding: 20px 24px; box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+    }
+    .stat-number {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.4rem; font-weight: 700; line-height: 1;
+      color: var(--text); margin-bottom: 4px;
+    }
+    .stat-label { font-size: 0.78rem; color: var(--text-sub); font-weight: 500; }
+
+    /* ════════════════════════════════════════
+       SECTION CARD
+    ════════════════════════════════════════ */
+    .card-section {
+      background: var(--white); border-radius: var(--radius);
+      border: 1px solid var(--border); box-shadow: var(--shadow-sm);
+      margin-bottom: 28px; overflow: hidden;
+    }
+    .section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 24px 18px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-title {
+      font-size: 1.05rem; font-weight: 700; color: var(--text);
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    /* ════════════════════════════════════════
+       EMPLOYEE CARD GRID ← KEY REDESIGN
+    ════════════════════════════════════════ */
+    .emp-grid-wrapper { padding: 24px; }
+
+    #emptyState {
+      text-align: center; padding: 60px 24px;
+    }
+    .empty-icon { font-size: 48px; margin-bottom: 12px; }
+    .empty-state p { color: var(--text-sub); font-size: 0.92rem; }
+
+    #listLoader {
+      text-align: center; padding: 48px;
+      color: var(--text-sub); font-size: 0.9rem;
+    }
+
+    /* THE GRID */
+    .emp-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 24px;
+    }
+
+    /* INDIVIDUAL EMPLOYEE CARD */
+    .emp-card {
+      background: var(--white);
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      display: flex; flex-direction: column;
+      align-items: center;
+      transition: transform 0.22s ease, box-shadow 0.22s ease;
+      position: relative;
+    }
+    .emp-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    /* Gold top accent bar */
+    .emp-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--maroon), var(--gold), var(--maroon));
+    }
+
+    /* Card header band */
+    .emp-card-header {
+      width: 100%;
+      background: linear-gradient(160deg, #0b1623 0%, #1a2d47 100%);
+      padding: 32px 20px 52px;
+      display: flex; justify-content: center;
+      position: relative;
+    }
+
+    /* Avatar container — sits half in header, half in body */
+    .emp-card-avatar-wrap {
+      position: absolute;
+      bottom: -44px;
+      width: 88px; height: 88px;
+    }
+
+    /* Spinning gradient ring */
+    .emp-card-avatar-ring {
+      position: absolute; inset: -3px; border-radius: 50%;
+      background: conic-gradient(from 0deg, var(--gold), #8b3a22 40%, var(--gold));
+      animation: ringsp 8s linear infinite;
+    }
+    @keyframes ringsp { to { transform: rotate(360deg); } }
+
+    /* White gap */
+    .emp-card-avatar-gap {
+      position: absolute; inset: 1px; border-radius: 50%;
+      background: white; z-index: 1;
+    }
+
+    /* The actual avatar image or initials */
+    .emp-card-avatar-img {
+      position: absolute; inset: 5px;
+      width: calc(100% - 10px); height: calc(100% - 10px);
+      border-radius: 50%;
+      object-fit: cover; object-position: top center;
+      z-index: 2;
+      display: none; /* JS toggles */
+    }
+    .emp-card-avatar-initials {
+      position: absolute; inset: 5px;
+      width: calc(100% - 10px); height: calc(100% - 10px);
+      border-radius: 50%; z-index: 2;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, #6b0f22, #300008);
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem; font-weight: 700;
+      color: var(--gold-lt); letter-spacing: -1px;
+    }
+
+    /* Card body */
+    .emp-card-body {
+      width: 100%; padding: 56px 18px 18px;
+      display: flex; flex-direction: column;
+      align-items: center; text-align: center; gap: 4px;
+    }
+    .emp-card-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem; font-weight: 700; color: var(--text);
+      line-height: 1.25; margin-bottom: 2px;
+    }
+    .emp-card-desg {
+      font-size: 0.72rem; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--maroon); margin-bottom: 4px;
+    }
+    .emp-card-mobile {
+      font-size: 0.78rem; color: var(--text-sub);
+      display: flex; align-items: center; gap: 4px;
+    }
+
+    /* Divider */
+    .emp-card-divider {
+      width: 32px; height: 2px; border-radius: 2px;
+      background: linear-gradient(90deg, var(--maroon), var(--gold));
+      margin: 8px 0;
+    }
+
+    /* Action buttons inside card */
+    .emp-card-actions {
+      width: 100%;
+      display: flex; flex-wrap: wrap; gap: 6px;
+      justify-content: center;
+      padding: 10px 14px 16px;
+      border-top: 1px solid var(--border);
+      margin-top: 8px;
+    }
+    .emp-card-actions .btn {
+      flex: 1 1 auto; min-width: 0;
+      padding: 6px 8px; font-size: 0.68rem;
+      border-radius: 8px; justify-content: center;
+    }
+
+    /* ════════════════════════════════════════
+       HOW IT WORKS SECTION
+    ════════════════════════════════════════ */
+    .how-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px; padding: 24px;
+    }
+    .how-card {
+      background: #f8fafd;
+      border: 1px solid var(--border);
+      border-radius: 14px; padding: 22px 18px;
+      position: relative; overflow: hidden;
+    }
+    .how-card::before {
+      content: attr(data-step);
+      position: absolute; top: -8px; right: 12px;
+      font-family: 'Playfair Display', serif;
+      font-size: 4rem; font-weight: 700;
+      color: var(--border); line-height: 1;
+      pointer-events: none;
+    }
+    .how-step {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: var(--maroon-grad); color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.85rem;
+      margin-bottom: 10px;
+    }
+    .how-title {
+      font-weight: 700; color: var(--maroon);
+      margin-bottom: 4px; font-size: 0.9rem;
+    }
+    .how-desc { font-size: 0.78rem; color: var(--text-sub); line-height: 1.5; }
+
+    /* ════════════════════════════════════════
+       MODAL
+    ════════════════════════════════════════ */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 500;
+      background: rgba(11,22,35,0.7); backdrop-filter: blur(6px);
+      align-items: center; justify-content: center;
+      padding: 16px;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal {
+      background: var(--white); border-radius: 20px;
+      box-shadow: var(--shadow-lg);
+      width: 100%; max-width: 680px;
+      max-height: 90vh; display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+    .modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      background: #fafbfc;
+    }
+    .modal-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem; font-weight: 700; color: var(--text);
+    }
+    .modal-close {
+      background: none; border: none; cursor: pointer;
+      font-size: 1.1rem; color: var(--text-sub);
+      width: 32px; height: 32px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s;
+    }
+    .modal-close:hover { background: #f0f4fa; }
+    .modal-body { overflow-y: auto; padding: 24px; flex: 1; }
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      background: #fafbfc;
+      display: flex; justify-content: flex-end; gap: 10px;
+    }
+
+    /* ════════════════════════════════════════
+       FORM INSIDE MODAL
+    ════════════════════════════════════════ */
+    .form-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+      margin-bottom: 16px;
+    }
+    .form-grid-3 {
+      display: grid; grid-template-columns: repeat(3,1fr); gap: 12px;
+    }
+    .form-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 0; }
+    .form-group label {
+      font-size: 0.74rem; font-weight: 600; color: #4a5568;
+      letter-spacing: 0.04em;
+    }
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      background: #f7f9fc;
+      border: 1.5px solid var(--border);
+      border-radius: 9px; padding: 10px 13px;
+      font-size: 0.87rem; font-family: 'DM Sans', sans-serif;
+      color: var(--text); outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(201,168,76,0.12);
+    }
+    .form-group input::placeholder,
+    .form-group textarea::placeholder { color: #b0bccf; }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+    .form-group input[type="file"] {
+      padding: 8px; font-size: 0.82rem; cursor: pointer;
+    }
+
+    /* Photo upload */
+    .photo-upload-area {
+      border: 2px dashed var(--border); border-radius: 14px;
+      padding: 24px; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 8px;
+      cursor: pointer; background: #f8fafd;
+      transition: border-color 0.2s, background 0.2s;
+      margin-bottom: 20px;
+    }
+    .photo-upload-area:hover { border-color: var(--gold); background: rgba(201,168,76,0.04); }
+    .upload-placeholder { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .upload-icon { font-size: 2rem; }
+    .upload-placeholder span { font-size: 0.85rem; color: var(--text-sub); font-weight: 500; }
+    .photo-preview {
+      border-radius: 50%; object-fit: cover;
+      object-position: top center;
+      width: 120px; height: 120px; margin: 0 auto;
+    }
+
+    /* Location box */
+    .location-box {
+      background: linear-gradient(135deg, rgba(66,133,244,0.06), rgba(15,60,110,0.04));
+      border: 2px dashed rgba(66,133,244,0.35);
+      border-radius: 12px; padding: 18px; margin-bottom: 16px;
+    }
+    .location-box-title {
+      font-size: 0.8rem; font-weight: 700; color: #1565c0; margin-bottom: 10px;
+    }
+    .location-box-tip {
+      font-size: 0.72rem; color: var(--text-sub); margin-top: 8px;
+      display: flex; align-items: flex-start; gap: 5px;
+    }
+
+    /* Catalogue box */
+    .catalogue-box {
+      background: linear-gradient(135deg, rgba(201,168,76,0.07), rgba(78,124,42,0.04));
+      border: 2px dashed rgba(201,168,76,0.45);
+      border-radius: 12px; padding: 18px; margin-bottom: 16px;
+    }
+    .catalogue-box-title {
+      font-size: 0.8rem; font-weight: 700; color: #8a6a1a; margin-bottom: 10px;
+    }
+
+    /* Social section */
+    .social-section-title {
+      font-size: 0.7rem; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--text-sub); margin-bottom: 12px;
+    }
+
+    /* Logo override */
+    .logo-section {
+      background: #f7f9fc; border: 1px solid var(--border);
+      border-radius: 12px; padding: 16px; margin-bottom: 8px;
+    }
+    .logo-section-title {
+      font-size: 0.7rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-sub); margin-bottom: 10px;
+    }
+
+    /* ════════════════════════════════════════
+       QR MODAL
+    ════════════════════════════════════════ */
+    .qr-display { text-align: center; padding: 8px 0; }
+    .qr-display #qrImage { display: flex; align-items: center; justify-content: center; }
+    .card-url {
+      background: #f4f6fa; border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 14px;
+      font-size: 0.78rem; color: var(--text-sub);
+      word-break: break-all; margin: 12px 0;
+    }
+
+    /* ════════════════════════════════════════
+       PAGE LOADER
+    ════════════════════════════════════════ */
+    #pageLoader {
+      position: fixed; inset: 0;
+      background: rgba(255,255,255,0.95);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 9999; flex-direction: column; gap: 14px;
+    }
+    .loader-ring {
+      width: 44px; height: 44px; border-radius: 50%;
+      border: 3px solid rgba(201,168,76,0.15);
+      border-top-color: var(--gold);
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loader-text { font-size: 0.8rem; color: var(--text-sub); letter-spacing: 0.06em; }
+
+    /* ════════════════════════════════════════
+       TOAST
+    ════════════════════════════════════════ */
+    .toast {
+      position: fixed; bottom: 28px; right: 28px; z-index: 1000;
+      background: var(--text); color: white;
+      padding: 12px 20px; border-radius: 12px;
+      font-size: 0.85rem; font-weight: 500;
+      box-shadow: var(--shadow-lg);
+      transform: translateY(80px) scale(0.95);
+      opacity: 0; pointer-events: none;
+      transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      max-width: 320px;
+    }
+    .toast.show { transform: translateY(0) scale(1); opacity: 1; }
+    .toast.success { background: #16a34a; }
+    .toast.error   { background: #dc2626; }
+
+    /* ════════════════════════════════════════
+       SEARCH BAR
+    ════════════════════════════════════════ */
+    .search-wrap {
+      padding: 0 24px 20px;
+      display: flex; gap: 10px; align-items: center;
+    }
+    .search-input {
+      flex: 1; background: #f7f9fc;
+      border: 1.5px solid var(--border);
+      border-radius: 10px; padding: 9px 16px 9px 40px;
+      font-size: 0.88rem; font-family: 'DM Sans', sans-serif;
+      color: var(--text); outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .search-input:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(201,168,76,0.1);
+    }
+    .search-input::placeholder { color: #adb8c6; }
+    .search-wrap-inner {
+      position: relative; flex: 1; max-width: 360px;
+    }
+    .search-icon {
+      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+      color: #adb8c6; pointer-events: none;
+    }
+
+    /* ════════════════════════════════════════
+       RESPONSIVE
+    ════════════════════════════════════════ */
+    @media (max-width: 768px) {
+      .container { padding: 20px 16px 48px; }
+      .topbar { padding: 0 16px; }
+      .topbar-brand-name { font-size: 0.85rem; }
+      .form-grid { grid-template-columns: 1fr; }
+      .form-grid-3 { grid-template-columns: 1fr; }
+      .emp-cards-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .how-grid { grid-template-columns: 1fr 1fr; }
+      .section-header { flex-wrap: wrap; gap: 10px; }
+    }
+    @media (max-width: 480px) {
+      .emp-cards-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+      .emp-card-name { font-size: 0.88rem; }
+      .emp-card-actions .btn { font-size: 0.62rem; padding: 5px 6px; }
+      .how-grid { grid-template-columns: 1fr; }
+    }
+    @media (min-width: 1024px) {
+      .emp-cards-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════
+       TOP NAVIGATION BAR
+  ══════════════════════════════════════ -->
+  <nav class="topbar">
+    <div class="topbar-brand">
+      <img src="mrk_logo.jpg" alt="MRK Foods" onerror="this.style.display='none'">
+      <div>
+        <div class="topbar-brand-name">MRK Foods Private Limited</div>
+        <div class="topbar-brand-sub">Admin Dashboard</div>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <div class="topbar-user">
+        <div class="user-dot" id="userInitials">A</div>
+        <span id="topbarUser">Admin</span>
+      </div>
+      <button class="btn btn-secondary btn-sm" onclick="doLogout()">Sign Out</button>
+    </div>
+  </nav>
+
+  <!-- Page Loader -->
+  <div id="pageLoader">
+    <div class="loader-ring"></div>
+    <div class="loader-text">Loading Dashboard…</div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       MAIN CONTENT
+  ══════════════════════════════════════ -->
+  <div class="container" style="display:none" id="mainContent">
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1 class="page-title">Employee Cards</h1>
+      <p class="page-subtitle">Manage digital visiting cards for your team — changes sync instantly worldwide ☁️</p>
+    </div>
+
+    <!-- Cloud Sync Banner -->
+    <div class="sync-banner">
+      <div class="sync-inner">
+        <div class="sync-icon">✅</div>
+        <div>
+          <div class="sync-title">Cloud Sync Active — Powered by Firebase</div>
+          <div class="sync-sub">All employee cards are stored in the cloud. Any device opening this dashboard or a card link sees the latest data <strong>instantly</strong>.</div>
+        </div>
+      </div>
+      <div class="live-badge">
+        <div class="live-dot"></div> Live
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-number" id="statTotal">–</div>
+        <div class="stat-label">Total Employees</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" style="font-size:1.6rem">☁️</div>
+        <div class="stat-label">Cloud Synced</div>
+      </div>
+    </div>
+
+    <!-- ═══ EMPLOYEE CARD GRID SECTION ═══ -->
+    <div class="card-section">
+      <div class="section-header">
+        <h2 class="section-title">
+          <!-- person icon -->
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--maroon)" stroke-width="2.2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          All Employees
+        </h2>
+        <button class="btn btn-maroon" onclick="openModal('empModal')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Add New Employee
+        </button>
+      </div>
+
+      <!-- Search -->
+      <div class="search-wrap" style="padding-top:20px">
+        <div class="search-wrap-inner">
+          <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="text" class="search-input" id="empSearch" placeholder="Search employees by name or designation…" oninput="filterEmployees()">
+        </div>
+      </div>
+
+      <!-- Empty state -->
+      <div id="emptyState" class="empty-state" style="display:none">
+        <div class="empty-icon">👤</div>
+        <p>No employees yet. Click <strong>Add New Employee</strong> to get started.</p>
+      </div>
+
+      <!-- Loader -->
+      <div id="listLoader" style="text-align:center;padding:48px;color:var(--text-sub);display:none">
+        <div class="loader-ring" style="margin:0 auto 14px"></div>
+        <div>Loading employees…</div>
+      </div>
+
+      <!-- CARD GRID — rendered by JS -->
+      <div class="emp-grid-wrapper">
+        <div class="emp-cards-grid" id="empCardGrid"></div>
+      </div>
+    </div>
+
+    <!-- ═══ HOW IT WORKS ═══ -->
+    <div class="card-section">
+      <div class="section-header">
+        <h2 class="section-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          How It Works
+        </h2>
+      </div>
+      <div class="how-grid">
+        <div class="how-card" data-step="1">
+          <div class="how-step">1</div>
+          <div class="how-title">Create Employee</div>
+          <div class="how-desc">Fill in details, upload photo, paste catalogue link. Saved instantly to cloud.</div>
+        </div>
+        <div class="how-card" data-step="2">
+          <div class="how-step">2</div>
+          <div class="how-title">Get Card Link</div>
+          <div class="how-desc">Copy the unique public link or download the QR code.</div>
+        </div>
+        <div class="how-card" data-step="3">
+          <div class="how-step">3</div>
+          <div class="how-title">Share With Customers</div>
+          <div class="how-desc">Customer scans QR → opens card → no login required.</div>
+        </div>
+        <div class="how-card" data-step="4">
+          <div class="how-step">4</div>
+          <div class="how-title">Instant Updates</div>
+          <div class="how-desc">Edit anytime — customers see the latest info immediately, no republish needed.</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /mainContent -->
+
+
+  <!-- ══════════════════════════════════════════════════════
+       EMPLOYEE ADD/EDIT MODAL — ALL FIELDS PRESERVED
+  ══════════════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="empModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modalTitle">Add New Employee</h3>
+        <button class="modal-close" onclick="closeModal('empModal')" aria-label="Close">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="empId">
+        <!-- CRITICAL: preserves Cloudinary photo URL across edits -->
+        <input type="hidden" id="existingPhotoURL">
+
+        <form id="empForm" onsubmit="event.preventDefault(); saveEmployee()">
+
+          <!-- Photo Upload -->
+          <div class="photo-upload-area" onclick="document.getElementById('empPhoto').click()">
+            <img id="photoPreview" class="photo-preview" src="" alt="Preview" style="display:none;">
+            <div id="photoPlaceholder" class="upload-placeholder" style="display:flex;flex-direction:column;align-items:center">
+              <span class="upload-icon">📷</span>
+              <span>Click to upload employee photo</span>
+              <span style="font-size:11px;color:#adb8c6">JPG, PNG • Full face visible • Max 5MB</span>
+            </div>
+            <input type="file" id="empPhoto" accept="image/*" style="display:none">
+          </div>
+
+          <!-- Basic Info -->
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Employee Name *</label>
+              <input type="text" id="empName" placeholder="e.g. Krishnadev Giri" required>
+            </div>
+            <div class="form-group">
+              <label>Designation</label>
+              <input type="text" id="empDesignation" placeholder="e.g. IT & Admin Manager">
+            </div>
+            <div class="form-group">
+              <label>Mobile Number</label>
+              <input type="tel" id="empMobile" placeholder="+91 98765 43210">
+            </div>
+            <div class="form-group">
+              <label>Email Address</label>
+              <input type="email" id="empEmail" placeholder="name@mrkfoods.in">
+            </div>
+            <div class="form-group">
+              <label>Website URL</label>
+              <input type="text" id="empWebsite" placeholder="https://www.mrkfoods.in/">
+            </div>
+            <div class="form-group">
+              <label>WhatsApp Number</label>
+              <input type="tel" id="empWhatsapp" placeholder="+91 98765 43210">
+            </div>
+          </div>
+
+          <!-- Address -->
+          <div class="form-group" style="margin-bottom:16px">
+            <label>Full Address</label>
+            <textarea id="empAddress" placeholder="Vijay House, Ground Floor, Devidayal Compound, near Samriddhi Garden, Bhandup West, Mumbai, Maharashtra 400078"></textarea>
+          </div>
+
+          <!-- Google Location Link -->
+          <div class="location-box">
+            <div class="location-box-title">📍 Google Location Link</div>
+            <div class="form-group" style="margin-bottom:0">
+              <label>Paste your Google Maps link (opens when customer taps Location button)</label>
+              <input type="url" id="empGoogleLocationLink" placeholder="https://maps.app.goo.gl/...">
+            </div>
+            <p class="location-box-tip">💡 Tip: Open Google Maps → Search your location → Share → Copy link. Paste it here.</p>
+          </div>
+
+          <!-- Social Media -->
+          <div style="margin-bottom:16px">
+            <div class="social-section-title">Social Media Links</div>
+            <div class="form-grid-3">
+              <div class="form-group">
+                <label>Facebook URL</label>
+                <input type="url" id="empFacebook" placeholder="https://facebook.com/...">
+              </div>
+              <div class="form-group">
+                <label>LinkedIn URL</label>
+                <input type="url" id="empLinkedin" placeholder="https://linkedin.com/in/...">
+              </div>
+              <div class="form-group">
+                <label>Instagram URL</label>
+                <input type="url" id="empInstagram" placeholder="https://instagram.com/...">
+              </div>
+            </div>
+          </div>
+
+          <!-- Product Catalogue -->
+          <div class="catalogue-box">
+            <div class="catalogue-box-title">📁 Product Catalogue Link</div>
+            <div class="form-group" style="margin-bottom:0">
+              <label>Paste Catalogue Link (Google Drive / OneDrive / PDF URL)</label>
+              <input type="url" id="empCatalogueLink" placeholder="https://drive.google.com/file/d/...">
+            </div>
+            <p style="font-size:0.72rem;color:var(--text-sub);margin-top:8px">💡 Tip: Paste a shareable Google Drive, OneDrive, or direct PDF URL. The "View Catalogue" button appears on the card.</p>
+          </div>
+
+          <!-- Logo Override -->
+          <div class="logo-section">
+            <div class="logo-section-title">Company Logo Override (optional)</div>
+            <div class="form-group">
+              <label>Upload alternate company logo for this card</label>
+              <input type="file" id="companyLogoOverride" accept="image/*">
+            </div>
+            <img id="logoPreviewImg" src="" alt="" style="display:none;max-height:48px;margin-top:8px;border-radius:8px">
+          </div>
+
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('empModal')">Cancel</button>
+        <button class="btn btn-maroon" id="saveEmpBtn" onclick="saveEmployee()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+            <polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
+          </svg>
+          Save Employee Card
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       QR CODE MODAL
+  ══════════════════════════════════════ -->
+  <div class="modal-overlay" id="qrModal">
+    <div class="modal" style="max-width:460px">
+      <div class="modal-header">
+        <h3 class="modal-title">📱 QR Code & Card Link</h3>
+        <button class="modal-close" onclick="closeModal('qrModal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="qr-display">
+          <p style="font-weight:700;color:var(--maroon);margin-bottom:16px;font-size:1rem" id="qrEmpName"></p>
+          <div id="qrImage" style="width:200px;height:200px;display:flex;align-items:center;justify-content:center;margin:0 auto;border-radius:12px;overflow:hidden"></div>
+          <p style="font-size:12px;color:var(--text-sub);margin:14px 0 8px">Scan to open card. No login required.</p>
+          <div class="card-url" id="qrCardUrl"></div>
+          <input type="hidden" id="qrCardUrlHidden">
+          <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:4px">
+            <button class="btn btn-green" onclick="copyQRLink()">🔗 Copy Link</button>
+            <button class="btn btn-maroon" onclick="downloadQR()">⬇️ Download QR</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ════════════════════════════════════
+       FIREBASE SDKS
+  ════════════════════════════════════ -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="admin.js"></script>
+
+  <!-- ════════════════════════════════════
+       OVERRIDE renderEmployeeList
+       Replaces the table with a beautiful
+       responsive card grid — all actions
+       (View, Copy, QR, Edit, Delete) kept.
+  ════════════════════════════════════ -->
+  <script>
+    // Store all employees for search filtering
+    let _allEmployees = [];
+
+    // ── Override the table renderer with a card grid renderer ──
+    function renderEmployeeList(employees) {
+      _allEmployees = employees || [];
+      _renderGrid(_allEmployees);
+    }
+
+    function _renderGrid(employees) {
+      const grid  = document.getElementById('empCardGrid');
+      const empty = document.getElementById('emptyState');
+      if (!grid) return;
+
+      if (!employees || employees.length === 0) {
+        grid.innerHTML = '';
+        if (empty) empty.style.display = 'block';
+        return;
+      }
+      if (empty) empty.style.display = 'none';
+
+      grid.innerHTML = employees.map(emp => {
+        const initials = emp.name
+          ? emp.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
+          : '?';
+        const cardUrl = getCardUrl(emp.id);
+
+        const avatarHtml = emp.photoURL
+          ? `<img class="emp-card-avatar-img" src="${escHtml(emp.photoURL)}"
+               alt="${escHtml(emp.name)}" style="display:block"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+          : '';
+        const initialsStyle = emp.photoURL ? 'style="display:none"' : '';
+
+        return `
+          <div class="emp-card">
+            <div class="emp-card-header">
+              <!-- header background only — no img here -->
+            </div>
+            <div class="emp-card-avatar-wrap">
+              <div class="emp-card-avatar-ring"></div>
+              <div class="emp-card-avatar-gap"></div>
+              ${avatarHtml}
+              <div class="emp-card-avatar-initials" ${initialsStyle}>${initials}</div>
+            </div>
+            <div class="emp-card-body">
+              <div class="emp-card-name">${escHtml(emp.name || '')}</div>
+              <div class="emp-card-desg">${escHtml(emp.designation || 'Employee')}</div>
+              <div class="emp-card-divider"></div>
+              ${emp.mobile ? `<div class="emp-card-mobile">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.63 3.22 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6.06 6.06l.97-.97a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+                </svg>
+                ${escHtml(emp.mobile)}
+              </div>` : ''}
+            </div>
+            <div class="emp-card-actions">
+              <a href="${escHtml(cardUrl)}" target="_blank" class="btn btn-green" title="View Card">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                View Card
+              </a>
+              <button onclick="copyLink('${escHtml(cardUrl)}')" class="btn btn-secondary" title="Copy Link">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                Copy
+              </button>
+              <button onclick="showQR('${emp.id}')" class="btn btn-secondary" title="QR Code">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h.01M14 17h.01M17 14h.01M17 17h3v3h-3v-3z"/></svg>
+                QR
+              </button>
+              <button onclick="editEmployee('${emp.id}')" class="btn btn-secondary" title="Edit"
+                style="background:#fff8f0;color:#c2410c;border-color:#fed7aa">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                Edit
+              </button>
+              <button onclick="deleteEmployee('${emp.id}','${escHtml(emp.name || '')}')" class="btn btn-danger" title="Delete">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                Del
+              </button>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    // ── Search / filter ──
+    function filterEmployees() {
+      const q = (document.getElementById('empSearch')?.value || '').toLowerCase().trim();
+      if (!q) { _renderGrid(_allEmployees); return; }
+      const filtered = _allEmployees.filter(e =>
+        (e.name || '').toLowerCase().includes(q) ||
+        (e.designation || '').toLowerCase().includes(q) ||
+        (e.mobile || '').includes(q)
+      );
+      _renderGrid(filtered);
+    }
+
+    // ── Update topbar user initials ──
+    const _origInit = window.initDashboard;
+    window.initDashboard = function() {
+      _origInit && _origInit();
+      // Hook into auth to update initials
+      if (typeof auth !== 'undefined') {
+        auth.onAuthStateChanged(function(user) {
+          if (user && user.email) {
+            const initEl = document.getElementById('userInitials');
+            if (initEl) initEl.textContent = user.email[0].toUpperCase();
+          }
+        });
+      }
+    };
+
+    // Boot
+    initDashboard();
+  </script>
+</body>
+</html>
